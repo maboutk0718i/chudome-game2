@@ -424,7 +424,7 @@
 </div>
 
 <section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.18</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.19</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -978,7 +978,7 @@ function visitLoop2(p){
  if(S.refused.has(p)){story(p,people[p].name,'「今日はもう撮影しません」<br><span class="thought">（二周目でも、一度出た答えは変わらない。）</span>',[['謝って離れる',()=>{S.backedOff++;show('map')}],['マップへ戻る',()=>show('map')]]);return}
  if(S.priorRefused.has(p)){loop2WaryVisit(p);return}
  if(!metInFirstLoop){loop2FirstMeet(p);return}
- story(p,'マボ',LOOP2_INTRO[p]+'<br><span class="thought">（次のちゅどーむ。前回と同じ人でも、今日の空気は今日のものだ。）</span>',[
+ story(p,'マボ',LOOP2_INTRO[p]+'<br><span class="thought">（今回のちゅどーむ。前回と同じ人でも、今日の空気は今日のものだ。）</span>',[
   ['声を掛ける',()=>loop2NormalChoices(p)],
   ['少し様子を見る',()=>{S.trust++;story(p,'マボ','少し離れて様子を見る。相手が落ち着いたところで目が合った。<br><span class="thought">（待つ時間も撮影の一部……って言うと格好つけすぎか。）</span>',[['声を掛ける',()=>loop2NormalChoices(p)],['まだ離れておく',()=>show('map')]])}],
   ['マップへ戻る',()=>show('map')]
@@ -1012,7 +1012,7 @@ function startSecondLoop(){
  n.bond={...prior.bond};
  S=n;updateShotStatus();
  theme('field');
- story('outdoor','数週間後','<b>次のちゅどーむイベント。</b><br><br>同じ会場。同じカメラ。同じバッグ。<br>前回会った人も、まだ一度も話していない人もいる。<br><span class="thought">（二回目のイベント。でも相手によっては今日が初対面だ。そこは勘違いするな、俺。）</span>',[
+ story('outdoor','数週間後','<b>今回のちゅどーむイベント。</b><br><br>同じ会場。同じカメラ。同じバッグ。<br>前回会った人も、まだ一度も話していない人もいる。<br><span class="thought">（二回目のイベント。でも相手によっては今日が初対面だ。そこは勘違いするな、俺。）</span>',[
   ['会場マップへ向かう',()=>{theme('field');show('map');window.scrollTo(0,0)}]
  ],IMG.venue);
  const loop2IntroImg=$('#sceneImg');if(loop2IntroImg)loop2IntroImg.classList.add('loop2IntroCrop');
