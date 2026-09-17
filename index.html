@@ -341,7 +341,21 @@
 .v2status{margin-top:7px;padding:7px 9px;border:1px solid #66727d;border-radius:7px;background:#111a22;color:#edf4f8;font-size:12px}
 .v2status b{color:#ffe082}.v2event{margin:8px 0;padding:8px;border-left:4px solid #d6c36a;background:#1a222b;font-size:13px}
 .resultCard{margin:15px 0;padding:14px;border:2px solid #d6c36a;background:#111820;border-radius:10px;line-height:1.8}.resultCard h3{color:#ffe082}.rankBig{font-size:36px;font-weight:900;color:#ffe082;text-align:center}
-</style></head><body>
+</style>
+<style id="audioControlStyle">
+.audioControl{position:fixed;z-index:9999;top:calc(8px + env(safe-area-inset-top,0px));right:8px;display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid #ffffff55;border-radius:12px;background:#020812e8;backdrop-filter:blur(8px);box-shadow:0 3px 12px #0008;font-size:12px}
+.audioControl button{width:42px;height:42px;border:1px solid #8fc8ef;border-radius:9px;background:#0b3152;color:#fff;font-size:20px;padding:0;display:grid;place-items:center}
+.audioControl label{display:flex;align-items:center;gap:6px;color:#eef7ff;font-weight:700;white-space:nowrap}
+.audioControl input[type=range]{width:105px;accent-color:#8fc8ef}
+.audioControl .volText{min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:390px){.audioControl{gap:5px;padding:6px}.audioControl label>span:first-child{display:none}.audioControl input[type=range]{width:86px}.audioControl .volText{min-width:30px}}
+</style>
+</head><body>
+<div class="audioControl" id="audioControl" aria-label="音量コントロール">
+  <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替">🔊</button>
+  <label for="volumeSlider"><span>音量</span><input id="volumeSlider" type="range" min="0" max="100" step="1" value="100" aria-label="音量"><span class="volText" id="volumeText">100%</span></label>
+</div>
+
 <section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 5.8</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
@@ -507,9 +521,24 @@ function initVenueMap(){
  });
 }
 function show(id){$$('.screen').forEach(x=>x.classList.remove('active'));$('#'+id).classList.add('active');if(id==='map'){updateShotStatus();v2Status();setTimeout(initVenueMap,0);if(S.timeMin>=900){setTimeout(v4Closing,50);return}if(AC)theme('field')}scrollTo(0,0)}
+let masterVolume=1,soundMuted=false;
+function applyMasterAudio(){
+  if(fullBgm){fullBgm.muted=soundMuted;const base=(fullBgmKind==='happy'||fullBgmKind==='bad')?.82:.96;fullBgm.volume=Math.max(0,Math.min(1,base*masterVolume));}
+  const mb=document.getElementById('muteBtn'),vs=document.getElementById('volumeSlider'),vt=document.getElementById('volumeText');
+  if(mb){mb.textContent=(soundMuted||masterVolume<=0)?'🔇':'🔊';mb.setAttribute('aria-pressed',soundMuted?'true':'false');}
+  if(vs && document.activeElement!==vs)vs.value=String(Math.round(masterVolume*100));
+  if(vt)vt.textContent=Math.round(masterVolume*100)+'%';
+}
+function initAudioControls(){
+  const mb=document.getElementById('muteBtn'),vs=document.getElementById('volumeSlider');
+  if(mb)mb.addEventListener('click',()=>{soundMuted=!soundMuted;applyMasterAudio();});
+  if(vs)vs.addEventListener('input',()=>{masterVolume=Math.max(0,Math.min(1,Number(vs.value)/100));if(masterVolume>0)soundMuted=false;applyMasterAudio();});
+  applyMasterAudio();
+}
+initAudioControls();
 function newAudioContext(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;return new C()}catch(e){return null}}
 function unlock(){try{if(!AC)AC=newAudioContext();if(AC&&AC.state!=='running')AC.resume()}catch(e){}}
-function tone(f,d=.5,v=.02,type='sine',delay=0){if(!AC)return;let o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+delay;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05)}
+function tone(f,d=.5,v=.02,type='sine',delay=0){if(!AC||soundMuted||masterVolume<=0)return;v*=masterVolume;let o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+delay;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05)}
 const FULL_BGM={
  title:'audio/title.mp3',field:'audio/dome.mp3',talk:'audio/dome.mp3',
  shoot:'audio/shot.mp3',rival:'audio/kameko.mp3',happy:'audio/happy.mp3',bad:'audio/bad.mp3'
@@ -517,14 +546,14 @@ const FULL_BGM={
 let fullBgm=null,fullBgmKind='',fullBgmWanted='';
 function ensureFullBgm(){
  if(fullBgm)return fullBgm;
- fullBgm=new Audio();fullBgm.loop=true;fullBgm.preload='auto';fullBgm.playsInline=true;return fullBgm;
+ fullBgm=new Audio();fullBgm.loop=true;fullBgm.preload='auto';fullBgm.playsInline=true;fullBgm.muted=soundMuted;return fullBgm;
 }
 function theme(kind){
  const alias={map:'field',dome:'field',venue:'field',camera:'shoot',kameko:'rival',tense:'rival',good:'happy',clear:'happy',gameover:'bad',badend:'bad'};
  kind=alias[kind]||kind;currentTheme=kind;fullBgmWanted=kind;
  let src=FULL_BGM[kind]||FULL_BGM.field,a=ensureFullBgm();
  if(fullBgmKind!==kind){a.pause();a.src=src;a.currentTime=0;fullBgmKind=kind}
- a.volume=(kind==='happy'||kind==='bad') ? .82 : .96;
+ a.volume=((kind==='happy'||kind==='bad') ? .82 : .96)*masterVolume;a.muted=soundMuted;
  let p=a.play();if(p&&p.catch)p.catch(()=>{audioNeedsResume=true});
 }
 function recoverFullAudio(){
@@ -544,6 +573,7 @@ function ensureSEAudio(){
  return SEAC;
 }
 function shotFx(){
+ if(soundMuted||masterVolume<=0)return;
  try{
   let c=ensureSEAudio(),t=c.currentTime;
   const snap=(at,dur,vol,high)=>{
@@ -555,7 +585,7 @@ function shotFx(){
    }
    let src=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();
    src.buffer=buf;bp.type='bandpass';bp.frequency.value=high;bp.Q.value=.8;
-   g.gain.setValueAtTime(vol,at);g.gain.exponentialRampToValueAtTime(.0001,at+dur);
+   g.gain.setValueAtTime(vol*masterVolume,at);g.gain.exponentialRampToValueAtTime(.0001,at+dur);
    src.connect(bp);bp.connect(g);g.connect(c.destination);src.start(at);
   };
   // 「カ」: 高く鋭い幕開き
@@ -565,7 +595,7 @@ function shotFx(){
   // ミラー/機構の小さな戻り音
   let o=c.createOscillator(),g=c.createGain();
   o.type='square';o.frequency.setValueAtTime(520,t+.055);o.frequency.exponentialRampToValueAtTime(180,t+.115);
-  g.gain.setValueAtTime(.26,t+.055);g.gain.exponentialRampToValueAtTime(.0001,t+.13);
+  g.gain.setValueAtTime(.26*masterVolume,t+.055);g.gain.exponentialRampToValueAtTime(.0001,t+.13);
   o.connect(g);g.connect(c.destination);o.start(t+.055);o.stop(t+.135);
  }catch(e){}
 }
