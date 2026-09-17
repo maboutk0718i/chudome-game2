@@ -424,7 +424,7 @@
 </div>
 
 <section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.19</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.21</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -999,7 +999,78 @@ function cameraEncounterLoop2(){
 }
 function cameraLoop2Result(){
  let text=S.camRep>=2?'田中が「東側、今ちょうど空きましたよ」と教えてくれた。前回より会話が短く、自然になっている。':S.camRep<=-3?'黒田が「まあ好きにすれば」とだけ言った。四人の輪はそのまま閉じた。':'情報交換はしたが、互いに少し距離を残した。';
- story('rivals','カメコたち',text+'<br><span class="thought">（カメコ同士も、二回目だから関係が続く。良くも悪くも。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],S.camRep>=1?IMG.tanaka:IMG.kuroda);
+ story('rivals','カメコたち',text+'<br><span class="thought">（ここで何を言うか。普通の一言でも、今までの関係で聞こえ方は変わる。）</span>',[
+  ['「この辺、いつもこんな感じなんですか？」',()=>cameraLoop2Nuance('scene')],
+  ['「まあ、お互い撮れればいいですよね」',()=>cameraLoop2Nuance('mutual')],
+  ['「またどこかで一緒になりそうですね」',()=>cameraLoop2Nuance('again')],
+  ['軽く会釈して会場マップへ戻る',()=>v4CompleteRivals()]
+ ],S.camRep>=1?IMG.tanaka:IMG.kuroda);
+}
+function cameraLoop2Nuance(kind){
+ const before=S.camRep;
+ let speaker='田中',img=IMG.tanaka,text='',delta=0;
+ if(kind==='scene'){
+   if(before>=2){delta=1;text='「まあ毎回こんな感じっすね。混む場所だけ気をつければ」<br>田中が普通に答え、黒田も「時間帯で変わるよ」と口を挟んだ。<br><span class="thought">（ただの質問として受け取ってもらえた。変に構えなくてよかった。）</span>'}
+   else if(before>=-1){delta=0;text='「んー、まあ……そんな感じですかね」<br>田中は少しだけ言葉を選んだ。黒田はマボの顔を一度見てからレンズへ視線を戻す。<br><span class="thought">（質問のつもりだったけど、“この空気なんなんですか”にも聞こえたか？）</span>'}
+   else{delta=-2;speaker='黒田';img=IMG.kuroda;text='黒田が顔を上げた。<br>「“こんな感じ”って、どういう意味？」<br>田中の表情も少し固くなる。<br><span class="thought">（しまった。今の関係だと、ただの質問には聞こえない。）</span>'}
+ }else if(kind==='mutual'){
+   if(before>=3){delta=1;text='田中が笑った。<br>「そうっすね。それが一番です」<br>黒田も肩をすくめる。「撮れれば文句ないよ」<br><span class="thought">（丸く収まった。こういうのでいい。）</span>'}
+   else if(before>=0){delta=0;text='「……まあ、そうですね」<br>返事は返ってきたが、一瞬だけ間があった。<br><span class="thought">（“お互い様”って、便利だけど上からにも聞こえるんだな。）</span>'}
+   else{delta=-2;speaker='黒田';img=IMG.kuroda;text='「お互い、ね」<br>黒田が短く繰り返した。田中は笑わず、ヒデが視線をそらす。<br><span class="thought">（こっちは収めたつもりでも、向こうには説教っぽく聞こえたらしい。）</span>'}
+ }else{
+   if(before>=2){delta=2;text='田中がすぐに返した。<br>「たぶんまた会いますよ。次もよろしくです」<br>リョウも軽く手を上げる。<br><span class="thought">（“また”が普通に次の約束として通じた。）</span>'}
+   else if(before>=-1){delta=0;text='「まあ、この界隈狭いですからね」<br>田中は軽く笑ったが、黒田は何も言わなかった。<br><span class="thought">（友好的にも、皮肉にも取れる。今の距離だとまだ微妙だ。）</span>'}
+   else{delta=-3;speaker='黒田';img=IMG.kuroda;text='「……それ、どういう意味？」<br>黒田の声が少し低くなる。田中もスマホから顔を上げた。<br><span class="thought">（“また会いましょう”のつもりが、“また会う羽目になる”みたいに響いた。）</span>'}
+ }
+ S.camRep+=delta;
+ if(delta<0)S.rivalFlags++;
+ if(S.camRep<=-5){S.camHostile=true;cameraLoop2Tension(speaker,text,img);return}
+ story('rivals',speaker,text,[
+  ['「じゃ、また」と短く切り上げる',()=>{if(S.camRep>=1)S.camRep++;v4CompleteRivals()}],
+  ['もう少しだけ話してから離れる',()=>cameraLoop2Followup()]
+ ],img);
+}
+function cameraLoop2Followup(){
+ if(S.camRep>=2){
+   S.camRep++;
+   story('rivals','田中','少しだけ混雑状況の話をしてから別れた。<br>「西側もそろそろ空くと思いますよ」<br><span class="thought">（普通に情報交換して終われた。前回よりはだいぶ自然だ。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],IMG.tanaka);
+   return;
+ }
+ if(S.camRep>=-2){
+   story('rivals','カメコたち','話は続いたが、誰も深く踏み込まない。<br>当たり障りのない機材と混雑の話だけで会話は終わった。<br><span class="thought">（悪くはなってない。良くもなってない。こういう距離もある。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],IMG.ryoji);
+   return;
+ }
+ S.camRep-=1;S.rivalFlags++;
+ cameraLoop2Tension('黒田','会話を続けようとしたが、返事がどんどん短くなる。<br>黒田が「もういい？」とレンズをバッグへ戻した。<br><span class="thought">（取り返そうとして喋るほど、空気が重くなる。）</span>',IMG.kuroda);
+}
+function cameraLoop2Tension(speaker,lead,img){
+ story('rivals',speaker,lead+'<br><br>四人の輪が少しだけ閉じる。完全に揉めたわけではない。だからこそ、ここからの一言が難しい。',[
+  ['「変な意味じゃないですよ」と補足する',()=>cameraLoop2Repair('explain')],
+  ['「まあ、気にしないでください」と引く',()=>cameraLoop2Repair('leave')],
+  ['何も言わず会釈して離れる',()=>cameraLoop2Repair('silent')]
+ ],img||IMG.kuroda);
+}
+function cameraLoop2Repair(kind){
+ if(kind==='silent'){
+   S.backedOff++;S.camRep+=1;
+   story('rivals','田中','田中が小さく会釈を返した。<br>それ以上、誰も何も言わなかった。<br><span class="thought">（修復じゃない。でも、これ以上壊さずに済んだ。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],IMG.tanaka);
+   return;
+ }
+ if(kind==='explain'){
+   if(S.camRep>=-5){S.camRep+=1;S.backedOff++;story('rivals','田中','「ああ、そういう意味なら……」<br>田中が間に入って空気を少し戻した。黒田は納得してはいないが、それ以上は言わない。<br><span class="thought">（ギリギリ。説明が通じる余地はまだあった。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],IMG.tanaka);return}
+   S.camRep-=1;S.rivalFlags++;
+ }else{
+   if(S.camRep>=-4){S.backedOff++;story('rivals','黒田','「……別に気にしてないけど」<br>声は平坦だった。マボはそこで会話を切った。<br><span class="thought">（良くはない。でも、ここで止めるしかない。）</span>',[['会場マップへ戻る',()=>v4CompleteRivals()]],IMG.kuroda);return}
+   S.camRep-=2;S.rivalFlags+=2;
+ }
+ S.camHostile=true;
+ cameraLoop2Fallout();
+}
+function cameraLoop2Fallout(){
+ S.camRep=Math.min(S.camRep,-6);S.camHostile=true;
+ story('rivals','カメコたち','田中はもう笑っていなかった。黒田は「もういいよ」とだけ言う。<br>ヒデはスマホを見たまま、リョウは少し距離を取った。<br><span class="thought">（大喧嘩はしてない。怒鳴ってもいない。でも、“次は関わらなくていい人”になったのが分かる。）</span>',[
+  ['その場を離れる',()=>secondLoopBadEnding('camera')]
+ ],IMG.kuroda);
 }
 function startSecondLoop(){
  const prior={
@@ -1214,7 +1285,10 @@ function individualEnding(p){setEndPosterMode('good');
 function secondLoopBadEnding(kind){setEndPosterMode('bad');
  theme('bad');show('end');$('#ending').className='endScene bad';
  const q=secondLoopStats();
- if(kind==='abyss'){
+ if(kind==='camera'){
+  $('#endTitle').textContent='SUPER BAD END　カメコ界隈から二度目に消ゆ';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${IMG.kuroda}"><img src="${IMG.tanaka}"><img src="${V8IMG.badPhone}"></div><div class="endChapter">今回のちゅどーむ ― その場で終わった関係</div><div class="endText">二度目だから、まだ修復できる余地はあった。だが何気なく選んだ言葉が、これまでの関係の上では皮肉や上から目線に聞こえた。取り返そうと重ねた一言も、さらに空気を悪くした。<br><br>レンズ越しの関係は薄くても、悪い印象だけは強く残る。</div><div class="endChapter">当日の夜 ― カメコのLINEグループ</div><div class="post"><b>田中</b><br>今日のマボさん、さすがにキツかったです。<br><br><b>ヒデ</b><br>また揉めそう。今後は一緒に回らない方がいい。<br><br><b>黒田</b><br>関わらなくていい。レイヤーにも近づけたくない。</div><div class="endText">名前はカメコ側から先に広がった。場所取り、言い方、会話の空気。ひとつひとつは小さくても、二度目の失敗は「そういう人」で固定される。</div><div class="endImpact">シャッターを切る前に、界隈での立ち位置が終わった。</div><div class="endText"><b>今回の結果</b><br>撮影済 ${q.done}人 / 撮影NG ${q.ng}人<br>カメコ評判：悪評固定<br><br><b>マボはレイヤーより先に、カメコ界隈から静かに外された。</b></div>`;
+ }else if(kind==='abyss'){
   $('#endTitle').textContent='SUPER BAD END　もう誰も近づかない';
   $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${V8IMG.bad}"><img src="${COMMON_WARNING_SNS}"><img src="${IMG.venue}"></div><div class="endChapter">二度目のちゅどーむ ― 開場直後</div><div class="endText">前回のことを覚えている人がいた。しかも、良い意味ではなかった。マボが近づく前にレイヤー同士の会話が止まり、視線が動いた。</div><div class="endChapter">同じ失敗を、もう一度</div><div class="endText">一度断られた相手に、また撮影を頼んだ。警戒されているのに距離を詰めた。前回なら「知らなかった」で済ませようとした言動を、今回は知った上で繰り返した。</div><div class="endImpact">一度目は失敗だった。二度目は、選択だった。</div><div class="endText">スタッフがこちらを確認する。レイヤーは友人の後ろへ下がる。カメラマンたちも輪を閉じる。<br><br><b>会場にいるのに、誰にも声を掛けられない。シャッターは一度も鳴らなかった。</b></div><div class="post"><b>本日の結果</b><br>撮影済 ${q.done}人 / 撮影NG ${q.ng}人<br>レイヤー評判：悪評固定<br>カメコ評判：${S.camRep<=-3?'悪評':'孤立'}</div>`;
  }else{
@@ -1226,6 +1300,7 @@ function secondLoopEnding(){setEndPosterMode('good');
  const q=secondLoopStats();
  const priorBad=S.priorRefused?.size||0;
  const severe=S.warningIncidents.length>0||S.pressureLog.length>=2||S.creep>=3||S.rude>=3||(priorBad>0&&S.pressureLog.length>0);
+ if((S.camRep<=-5&&S.camHostile))return secondLoopBadEnding('camera');
  if(S.camRep<=-5||severe)return secondLoopBadEnding('abyss');
  if(S.pressureLog.length>0||S.creep+S.rude>=3||S.unease+S.rivalFlags>=8)return secondLoopBadEnding('distance');
  theme('good');show('end');$('#ending').className='endScene good';
