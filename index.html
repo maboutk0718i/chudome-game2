@@ -374,12 +374,27 @@
 .audioControl{position:fixed;z-index:9999;top:calc(58px + env(safe-area-inset-top,0px));right:8px;padding:6px;border:1px solid #ffffff55;border-radius:12px;background:#020812e8;backdrop-filter:blur(8px);box-shadow:0 3px 12px #0008}
 .audioControl button{width:44px;height:44px;border:1px solid #8fc8ef;border-radius:9px;background:#0b3152;color:#fff;font-size:20px;padding:0;display:grid;place-items:center}
 </style>
+
+<style id="mapFaceNoCropV610">
+/* Ver.6.10: do not crop venue-map portraits */
+.mapNpc .mapFace{
+  object-fit:contain!important;
+  object-position:center center!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  background:#0b1723!important;
+  overflow:hidden!important;
+}
+@media(max-width:390px){
+  .mapNpc .mapFace{padding:6px!important}
+}
+</style>
 </head><body>
 <div class="audioControl" id="audioControl" aria-label="サウンド切替">
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.9</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.10</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
