@@ -535,7 +535,6 @@ function initAudioControls(){
   if(vs)vs.addEventListener('input',()=>{masterVolume=Math.max(0,Math.min(1,Number(vs.value)/100));if(masterVolume>0)soundMuted=false;applyMasterAudio();});
   applyMasterAudio();
 }
-initAudioControls();
 function newAudioContext(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;return new C()}catch(e){return null}}
 function unlock(){try{if(!AC)AC=newAudioContext();if(AC&&AC.state!=='running')AC.resume()}catch(e){}}
 function tone(f,d=.5,v=.02,type='sine',delay=0){if(!AC||soundMuted||masterVolume<=0)return;v*=masterVolume;let o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+delay;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05)}
@@ -544,6 +543,7 @@ const FULL_BGM={
  shoot:'audio/shot.mp3',rival:'audio/kameko.mp3',happy:'audio/happy.mp3',bad:'audio/bad.mp3'
 };
 let fullBgm=null,fullBgmKind='',fullBgmWanted='';
+initAudioControls();
 function ensureFullBgm(){
  if(fullBgm)return fullBgm;
  fullBgm=new Audio();fullBgm.loop=true;fullBgm.preload='auto';fullBgm.playsInline=true;fullBgm.muted=soundMuted;return fullBgm;
