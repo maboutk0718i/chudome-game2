@@ -365,6 +365,19 @@
 .mapNpc[data-place="east"] .mapFace{object-position:center 6%!important}
 .mapNpc[data-place="indoor"] .mapFace{object-position:center 3%!important}
 
+
+/* Ver.6.12 pre-title prologue */
+#pretitle{background:#000;min-height:100dvh;overflow:hidden;align-items:center;justify-content:center;position:relative}
+.pretitleInner{position:relative;width:100%;height:100dvh;display:flex;align-items:center;justify-content:center;background:#000}
+#preludeStart{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:min(78vw,340px);min-height:58px;border:1px solid #dfe8f0;border-radius:8px;background:#050505;color:#fff;font-size:18px;font-weight:800;letter-spacing:.08em;box-shadow:0 0 20px #ffffff18}
+#preludeStart:active{transform:translate(-50%,-50%) scale(.98)}
+#preludeText{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);text-align:center;color:#fff;font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(25px,7vw,42px);font-weight:700;letter-spacing:.08em;line-height:1.7;opacity:0;text-shadow:0 2px 12px #000;pointer-events:none}
+#preludeText.show{animation:preludeFade 2.5s ease-in-out forwards}
+#preludeText.small{font-size:clamp(21px,6vw,34px)}
+@keyframes preludeFade{0%{opacity:0}22%{opacity:1}68%{opacity:1}100%{opacity:0}}
+#title.pretitleArrival .hero{animation:titleArrival .9s ease-out both}
+@keyframes titleArrival{from{opacity:0}to{opacity:1}}
+
 </style><style>
 .v2status{margin-top:7px;padding:7px 9px;border:1px solid #66727d;border-radius:7px;background:#111a22;color:#edf4f8;font-size:12px}
 .v2status b{color:#ffe082}.v2event{margin:8px 0;padding:8px;border-left:4px solid #d6c36a;background:#1a222b;font-size:13px}
@@ -402,7 +415,8 @@
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.11</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.12</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -654,17 +668,56 @@ function shotFx(){
  }catch(e){}
 }
 try{let old=$('#secondLoopBtn');if(old)old.remove()}catch(e){}
+let preludeRunning=false;
+function primeTitleBgm(){
+ unlock();
+ try{
+   let a=ensureFullBgm();
+   fullBgmWanted='title';
+   if(fullBgmKind!=='title'){
+     a.pause();a.src=FULL_BGM.title;a.currentTime=0;fullBgmKind='title';
+   }
+   a.muted=soundMuted;
+   a.volume=0;
+   let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true});
+ }catch(e){audioNeedsResume=true}
+}
+function showPreludeLine(html,small=false){
+ return new Promise(resolve=>{
+   const t=$('#preludeText');
+   t.className=small?'small':'';
+   t.innerHTML=html;
+   void t.offsetWidth;
+   t.classList.add('show');
+   setTimeout(()=>{t.classList.remove('show');resolve()},2500);
+ });
+}
+async function runTitlePrelude(){
+ if(preludeRunning)return;
+ preludeRunning=true;
+ const b=$('#preludeStart');if(b){b.disabled=true;b.style.opacity='0';b.style.pointerEvents='none'}
+ await showPreludeLine('MABOX presents',true);
+ await new Promise(r=>setTimeout(r,260));
+ await showPreludeLine('そして、ちゅどーむへ——');
+ await new Promise(r=>setTimeout(r,280));
+ first=true;
+ const title=$('#title');if(title)title.classList.add('pretitleArrival');
+ show('title');
+ try{let a=ensureFullBgm();a.muted=soundMuted;a.volume=.96*masterVolume;let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true})}catch(e){}
+ const press=$('#press');if(press)press.textContent='ゲームをはじめる';
+ setTimeout(()=>{if(title)title.classList.remove('pretitleArrival')},1000);
+ preludeRunning=false;
+}
+$('#preludeStart').onclick=e=>{
+ e.stopPropagation();
+ primeTitleBgm();
+ runTitlePrelude();
+};
 $('#titleTap').onclick=e=>{if(e.target.id!=='press')return};
 $('#press').onclick=e=>{
  e.stopPropagation();
  unlock();
  click();
- if(!first){
-   first=true;
-   theme('title');
-   e.currentTarget.textContent='ゲームをはじめる';
-   return;
- }
  theme('talk');
  show('intro');
 };
@@ -1226,15 +1279,18 @@ function resetTitleScreen(){
 
   const press=$('#press');
   if(press){
-    press.textContent='タップしてスタート';
+    press.textContent='ゲームをはじめる';
     press.style.removeProperty('display');
     press.style.removeProperty('visibility');
     press.style.removeProperty('opacity');
     press.style.removeProperty('pointer-events');
     press.disabled=false;
   }
-
-  show('title');
+  const ps=$('#preludeStart');
+  if(ps){ps.disabled=false;ps.style.opacity='1';ps.style.pointerEvents='auto'}
+  const pt=$('#preludeText');if(pt){pt.className='';pt.innerHTML=''}
+  preludeRunning=false;
+  show('pretitle');
   requestAnimationFrame(()=>{
     window.scrollTo(0,0);
     document.documentElement.scrollTop=0;
@@ -1251,7 +1307,7 @@ $('#restart').onclick=()=>{
 // iOS/X in-app browser may restore a page from back-forward cache.
 // If the title is the active screen, always restore the start button explicitly.
 window.addEventListener('pageshow',()=>{
-  const title=$('#title');
+  const title=$('#title'),pre=$('#pretitle');
   if(title && title.classList.contains('active')){
     const press=$('#press');
     if(press){
@@ -1260,8 +1316,11 @@ window.addEventListener('pageshow',()=>{
       press.style.removeProperty('opacity');
       press.style.removeProperty('pointer-events');
       press.disabled=false;
-      if(!first) press.textContent='タップしてスタート';
+      press.textContent='ゲームをはじめる';
     }
+  }
+  if(pre && pre.classList.contains('active')&&!preludeRunning){
+    const ps=$('#preludeStart');if(ps){ps.disabled=false;ps.style.opacity='1';ps.style.pointerEvents='auto'}
   }
 });
 
