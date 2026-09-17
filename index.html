@@ -424,7 +424,7 @@
 </div>
 
 <section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.21</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.22</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -895,6 +895,7 @@ function loop2NormalChoices(p){
  const line=loop2RepGreeting(p);
  story(p,P.name,line,[
   ['前回の話は短くして、今日の希望を聞く',()=>{S.trust+=2;S.bond[p]+=2;loop2ShootOffer(p)}],
+  [LAYER_AMBIGUOUS[p].label,()=>ambiguousLayerChoice(p,true)],
   ['「覚えててくれたんですね！」と距離を詰める',()=>{S.unease+=2;S.bond[p]--;loop2Landmine(p)}],
   ['今日は挨拶だけして離れる',()=>{S.rep++;show('map')}]
  ]);
@@ -1094,17 +1095,50 @@ function visit(p){
  let P=people[p];S.met.add(p);
  if(S.shotDone.has(p)){postShootVisit(p);return}
  if(S.refused.has(p)){story(p,P.name,P.intro+'<br><span class="thought">（この人には一度撮影を断られている。今日はもう撮影をお願いしない。）</span>',[['挨拶だけする',()=>{S.rep++;show('map')}],['静かにその場を離れる',()=>show('map')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（いきなりカメラを向けるのは違う。まず、どう入る……？）</span>',[['脳内で声かけを3回リハーサルする',()=>yukinaRehearsal()],['雪奈に短く挨拶する',()=>talk(p)],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],['マップへ戻る',()=>show('map')]]);return}
- if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。……でも知ったかぶりは一発でバレる。作品の話を聞くか、俺の撮りたい絵を短く伝えるか。）</span>',[['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここで撮影を急かしたら、写真以前の問題になる。……でも声だけ掛けて存在を覚えてもらいたい欲もある。欲、引っ込め。）</span>',[['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしてそうだ。ここで「何でもいいです」は地雷臭がする。俺の勘がそう言ってる。）</span>',[['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['「ポーズも場所も全部お任せで」と丸投げする',()=>layerTrap('east')],['マップへ戻る',()=>show('map')]]);return}
- story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝える。……「せっかく来たんだから」は俺の都合。飲み込め。）</span>',[['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],['「友達が来てもあと5分だけ」と先に頼む',()=>layerTrap('entrance')],['マップへ戻る',()=>show('map')]])
+ if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（いきなりカメラを向けるのは違う。まず、どう入る……？）</span>',[['脳内で声かけを3回リハーサルする',()=>yukinaRehearsal()],['雪奈に短く挨拶する',()=>talk(p)],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],[LAYER_AMBIGUOUS.outdoor.label,()=>ambiguousLayerChoice('outdoor')],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。……でも知ったかぶりは一発でバレる。作品の話を聞くか、俺の撮りたい絵を短く伝えるか。）</span>',[['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],[LAYER_AMBIGUOUS.indoor.label,()=>ambiguousLayerChoice('indoor')],['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここで撮影を急かしたら、写真以前の問題になる。……でも声だけ掛けて存在を覚えてもらいたい欲もある。欲、引っ込め。）</span>',[['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],[LAYER_AMBIGUOUS.rest.label,()=>ambiguousLayerChoice('rest')],['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしてそうだ。ここで「何でもいいです」は地雷臭がする。俺の勘がそう言ってる。）</span>',[['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],[LAYER_AMBIGUOUS.east.label,()=>ambiguousLayerChoice('east')],['「ポーズも場所も全部お任せで」と丸投げする',()=>layerTrap('east')],['マップへ戻る',()=>show('map')]]);return}
+ story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝える。……「せっかく来たんだから」は俺の都合。飲み込め。）</span>',[['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],[LAYER_AMBIGUOUS.entrance.label,()=>ambiguousLayerChoice('entrance')],['「友達が来てもあと5分だけ」と先に頼む',()=>layerTrap('entrance')],['マップへ戻る',()=>show('map')]])
 }
 function yukinaRehearsal(){
  story('outdoor','マボ','<span class="thought">（こんにちは、撮影いいですか？ ……固い。<br>こんにちは！ 一枚お願いしても……いや距離近い。<br>あの、もしよければ……って何に“もし”だよ俺。）</span><br><br>三回練習した結果、最初の一言すら分からなくなった。',[['結局、普通に「こんにちは」と言う',()=>{S.rep++;talk('outdoor')}],['もう一回だけ脳内会議する',()=>{S.unease++;story('outdoor','マボ','<span class="thought">（四回目。今度こそ完璧に……。）</span><br>雪奈と目が合った。<br><span class="thought">（終わった。もう行くしかない。）</span>',[['腹をくくって声を掛ける',()=>talk('outdoor')],['いったんマップへ戻る',()=>show('map')]])}],['いったん離れる',()=>show('map')]])
 }
 function observe(p){S.trust++;if(S.bond&&S.bond[p]!==undefined)S.bond[p]++;let tx=p==='rest'?'休憩が終わるまで距離を取った。しばらくして、みくが立ち上がる。':p==='east'?'カレンは背景をかなり気にしている。撮るなら構図を雑にしない方がよさそうだ。':'相手の手が空いた。今なら声を掛けても不自然ではなさそうだ。';story(p,'マボ',tx+'<br><span class="thought">（今だ。……いや、今だよな？ 三秒待つ？ 待ちすぎ？）</span>',[['声を掛ける',()=>talk(p)],['今日は離れる',()=>{S.rep++;show('map')}]])}
-function talk(p){let P=people[p];if(p==='outdoor'){story(p,'雪奈','「こんにちは。撮影ですか？」<br>雪奈は普通に返してくれた。普通だ。ここで普通を壊すな。',[['衣装の工夫について聞く',()=>{S.trust+=2;S.bond.outdoor+=2;reijiEncounter()}],['「前のイベントからずっと見てました」と距離を詰める',()=>layerTrap('outdoor')],['まず短く撮影をお願いする',()=>{S.trust++;S.bond.outdoor++;reijiEncounter()}],['一度離れる',()=>show('map')]]);return}let special=p==='rest'?'「今休憩中なので……」':p==='east'?'「どんな雰囲気で撮る予定ですか？」':p==='entrance'?'「友達待ってるんですけど、少しなら」':'「ここなら少し空いてますね」';story(p,P.name,special,[['相手の希望と時間を先に聞く',()=>other(p,true)],['自分の機材と撮影歴を詳しく説明する',()=>other(p,false)],['挨拶だけして離れる',()=>{S.rep++;show('map')}]])}
+function talk(p){let P=people[p];if(p==='outdoor'){story(p,'雪奈','「こんにちは。撮影ですか？」<br>雪奈は普通に返してくれた。普通だ。ここで普通を壊すな。',[['衣装の工夫について聞く',()=>{S.trust+=2;S.bond.outdoor+=2;reijiEncounter()}],[LAYER_AMBIGUOUS.outdoor.label,()=>ambiguousLayerChoice('outdoor')],['「前のイベントからずっと見てました」と距離を詰める',()=>layerTrap('outdoor')],['まず短く撮影をお願いする',()=>{S.trust++;S.bond.outdoor++;reijiEncounter()}],['一度離れる',()=>show('map')]]);return}let special=p==='rest'?'「今休憩中なので……」':p==='east'?'「どんな雰囲気で撮る予定ですか？」':p==='entrance'?'「友達待ってるんですけど、少しなら」':'「ここなら少し空いてますね」';story(p,P.name,special,[['相手の希望と時間を先に聞く',()=>other(p,true)],['自分の機材と撮影歴を詳しく説明する',()=>other(p,false)],['挨拶だけして離れる',()=>{S.rep++;show('map')}]])}
+const LAYER_AMBIGUOUS={
+ outdoor:{label:'「写真だとクールだけど、話すと柔らかいんですね」',good:'「そう見えます？ 撮ってる時は結構真顔かも」<br>雪奈は少し笑った。',mid:'「あ、そうですか？」<br>雪奈は笑ったが、どう受け取ったのかは読めない。',bad:'「……写真だけでそんなに分かるんですか？」<br>雪奈の笑顔が少し薄くなった。',thoughtGood:'（褒めたつもりが、ちゃんと会話になった。よし、余計な一言は足さない。）',thoughtMid:'（褒め言葉のつもり。でも“見てる感”が強かったか？ 判定不能。）',thoughtBad:'（人物評まで踏み込むには、まだ距離が遠かった。）'},
+ indoor:{label:'「その衣装、かなり“本人っぽい”ですね」',good:'「そこ分かります？ 結構寄せたかったんです」<br>りおの声が少し弾んだ。',mid:'「ありがとうございます。……本人っぽい、ですか」<br>りおは衣装を見下ろした。',bad:'「“本人っぽい”って、どの辺ですか？」<br>りおの視線が少し鋭くなった。',thoughtGood:'（解釈が合った。衣装の話は本人のこだわりを聞くのが一番だ。）',thoughtMid:'（褒めたつもりだが、知ったかぶり判定を受けてる気がする。）',thoughtBad:'（作品理解が浅いのに分かった風に言った。これは刺さる。）'},
+ rest:{label:'「こういうイベント、意外と疲れますよね」',good:'「分かります。楽しいんですけど、ずっと人多いので」<br>みくは少し肩の力を抜いた。',mid:'「まあ……そうですね」<br>みくは飲み物に視線を戻した。',bad:'「私、そんなに疲れて見えます？」<br>みくが少し困った顔をした。',thoughtGood:'（休憩してる理由を決めつけずに済んだ。会話としてはセーフ。）',thoughtMid:'（共感のつもりが、“疲れて見える”に変換された可能性あるな。）',thoughtBad:'（相手の状態を勝手に診断した。気遣いと決めつけは近い。）'},
+ east:{label:'「この背景、カレンさんっぽいですね」',good:'「ですよね。今日はここを使いたかったんです」<br>カレンが背景を見てうなずいた。',mid:'「私っぽい……ですか？」<br>カレンは少し考えるように背景を見る。',bad:'「まだ私のこと、そんなに知らないですよね？」<br>カレンは穏やかだが、返しは鋭い。',thoughtGood:'（本人の狙いと一致した。ここから構図の話に持っていける。）',thoughtMid:'（“っぽい”は便利すぎる。説明できないなら使わない方がいい。）',thoughtBad:'（勝手にイメージを決めつけた。作品撮り好きには雑な言葉だった。）'},
+ entrance:{label:'「友達待ちなら、逆に今ちょうどいいですか？」',good:'「あ、確かに今なら少しあります」<br>あやは入口を確認して笑った。',mid:'「うーん、来る時間次第ですけど……」<br>あやはスマホの時計を見る。',bad:'「待ってる時間も私の時間なので……」<br>あやの返事は柔らかいが、線を引かれた。',thoughtGood:'（時間を奪う言い方にならずに済んだ。短く確認しよう。）',thoughtMid:'（“空き時間＝撮影時間”ではない。ここは確認が必要だ。）',thoughtBad:'（待ち時間を勝手に俺の撮影枠にした。そりゃ違う。）'}
+};
+function ambiguousLayerChoice(p,loop2=false){
+ const P=people[p],cfg=LAYER_AMBIGUOUS[p];
+ const local=(S.bond?.[p]||0)+(loop2?(S.priorBond?.[p]||0)*0.35:0)+Math.max(-2,Math.min(3,layerRepScore()/4))-S.unease*.45-S.rude*.6;
+ if(local>=4){
+   S.trust++;S.bond[p]=(S.bond[p]||0)+2;S.rep++;
+   story(p,P.name,cfg.good+'<br><span class="thought">'+cfg.thoughtGood+'</span>',[
+    ['撮影の希望を聞く',()=>{if(loop2)loop2ShootOffer(p);else if(p==='outdoor')reijiEncounter();else other(p,true)}],
+    ['ここで会話を切り上げる',()=>show('map')]
+   ]);return;
+ }
+ if(local<=0){
+   S.unease+=2;S.bond[p]=Math.max(-3,(S.bond[p]||0)-1);
+   story(p,P.name,cfg.bad+'<br><span class="thought">'+cfg.thoughtBad+'</span>',[
+    ['「言い方変でした、すみません」と引く',()=>{S.backedOff++;S.unease=Math.max(0,S.unease-1);show('map')}],
+    ['意図を説明して会話を続ける',()=>{S.unease++;S.creep++;story(p,P.name,'「あ、はい……」<br>説明を重ねるほど、会話の温度が下がっていく。<br><span class="thought">（伝わらなかった時に長く説明する癖、危ない。）</span>',[
+      ['ここで離れる',()=>{S.backedOff++;show('map')}],
+      ['そのまま撮影をお願いする',()=>{refuse(p);recordPressure(p,'曖昧な一言で警戒された後も撮影を頼む');other(p,false)}]
+    ])}]
+   ]);return;
+ }
+ S.bond[p]=(S.bond[p]||0)+1;
+ story(p,P.name,cfg.mid+'<br><span class="thought">'+cfg.thoughtMid+'</span>',[
+   ['相手の反応を見て希望を聞く',()=>{S.trust++;if(loop2)loop2ShootOffer(p);else if(p==='outdoor')reijiEncounter();else other(p,true)}],
+   ['深追いせず離れる',()=>{S.backedOff++;show('map')}]
+ ]);
+}
 function layerTrap(p){
  let P=people[p];
  let cfg={
