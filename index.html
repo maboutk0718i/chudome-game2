@@ -351,7 +351,7 @@
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 5.9</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.0</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -625,16 +625,32 @@ function visit(p){
  if(S.shotDone.has(p)){postShootVisit(p);return}
  if(S.refused.has(p)){story(p,P.name,P.intro+'<br><span class="thought">（この人には一度撮影を断られている。今日はもう撮影をお願いしない。）</span>',[['挨拶だけする',()=>{S.rep++;show('map')}],['静かにその場を離れる',()=>show('map')],['マップへ戻る',()=>show('map')]]);return}
  if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（いきなりカメラを向けるのは違う。まず、どう入る……？）</span>',[['脳内で声かけを3回リハーサルする',()=>yukinaRehearsal()],['雪奈に短く挨拶する',()=>talk(p)],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],['マップへ戻る',()=>show('map')]]);return}
- if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。衣装の意図から聞くか、撮影イメージから入るか。）</span>',[['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['いきなり撮影をお願いする',()=>direct('indoor')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここは撮影より、相手の時間を優先する場面だ。）</span>',[['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],['今すぐ一枚だけお願いする',()=>direct('rest')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしていそうだ。）</span>',[['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['機材の性能をアピールする',()=>direct('east')],['マップへ戻る',()=>show('map')]]);return}
- story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝えよう。）</span>',[['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],['すぐ撮影をお願いする',()=>direct('entrance')],['マップへ戻る',()=>show('map')]])
+ if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。……でも知ったかぶりは一発でバレる。作品の話を聞くか、俺の撮りたい絵を短く伝えるか。）</span>',[['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここで撮影を急かしたら、写真以前の問題になる。……でも声だけ掛けて存在を覚えてもらいたい欲もある。欲、引っ込め。）</span>',[['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしてそうだ。ここで「何でもいいです」は地雷臭がする。俺の勘がそう言ってる。）</span>',[['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['「ポーズも場所も全部お任せで」と丸投げする',()=>layerTrap('east')],['マップへ戻る',()=>show('map')]]);return}
+ story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝える。……「せっかく来たんだから」は俺の都合。飲み込め。）</span>',[['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],['「友達が来てもあと5分だけ」と先に頼む',()=>layerTrap('entrance')],['マップへ戻る',()=>show('map')]])
 }
 function yukinaRehearsal(){
  story('outdoor','マボ','<span class="thought">（こんにちは、撮影いいですか？ ……固い。<br>こんにちは！ 一枚お願いしても……いや距離近い。<br>あの、もしよければ……って何に“もし”だよ俺。）</span><br><br>三回練習した結果、最初の一言すら分からなくなった。',[['結局、普通に「こんにちは」と言う',()=>{S.rep++;talk('outdoor')}],['もう一回だけ脳内会議する',()=>{S.unease++;story('outdoor','マボ','<span class="thought">（四回目。今度こそ完璧に……。）</span><br>雪奈と目が合った。<br><span class="thought">（終わった。もう行くしかない。）</span>',[['腹をくくって声を掛ける',()=>talk('outdoor')],['いったんマップへ戻る',()=>show('map')]])}],['いったん離れる',()=>show('map')]])
 }
 function observe(p){S.trust++;if(S.bond&&S.bond[p]!==undefined)S.bond[p]++;let tx=p==='rest'?'休憩が終わるまで距離を取った。しばらくして、みくが立ち上がる。':p==='east'?'カレンは背景をかなり気にしている。撮るなら構図を雑にしない方がよさそうだ。':'相手の手が空いた。今なら声を掛けても不自然ではなさそうだ。';story(p,'マボ',tx+'<br><span class="thought">（今だ。……いや、今だよな？ 三秒待つ？ 待ちすぎ？）</span>',[['声を掛ける',()=>talk(p)],['今日は離れる',()=>{S.rep++;show('map')}]])}
-function talk(p){let P=people[p];if(p==='outdoor'){story(p,'雪奈','「こんにちは。撮影ですか？」<br>雪奈は普通に返してくれた。普通だ。ここで普通を壊すな。',[['衣装の工夫について聞く',()=>{S.trust+=2;S.bond.outdoor+=2;reijiEncounter()}],['「SNSずっと見てました」と伝える',()=>{S.creep+=2;S.unease+=2;if(!rude())reijiEncounter()}],['まず短く撮影をお願いする',()=>{S.trust++;S.bond.outdoor++;reijiEncounter()}],['一度離れる',()=>show('map')]]);return}let special=p==='rest'?'「今休憩中なので……」':p==='east'?'「どんな雰囲気で撮る予定ですか？」':p==='entrance'?'「友達待ってるんですけど、少しなら」':'「ここなら少し空いてますね」';story(p,P.name,special,[['相手の希望と時間を先に聞く',()=>other(p,true)],['自分の機材と撮影歴を詳しく説明する',()=>other(p,false)],['挨拶だけして離れる',()=>{S.rep++;show('map')}]])}
+function talk(p){let P=people[p];if(p==='outdoor'){story(p,'雪奈','「こんにちは。撮影ですか？」<br>雪奈は普通に返してくれた。普通だ。ここで普通を壊すな。',[['衣装の工夫について聞く',()=>{S.trust+=2;S.bond.outdoor+=2;reijiEncounter()}],['「前のイベントからずっと見てました」と距離を詰める',()=>layerTrap('outdoor')],['まず短く撮影をお願いする',()=>{S.trust++;S.bond.outdoor++;reijiEncounter()}],['一度離れる',()=>show('map')]]);return}let special=p==='rest'?'「今休憩中なので……」':p==='east'?'「どんな雰囲気で撮る予定ですか？」':p==='entrance'?'「友達待ってるんですけど、少しなら」':'「ここなら少し空いてますね」';story(p,P.name,special,[['相手の希望と時間を先に聞く',()=>other(p,true)],['自分の機材と撮影歴を詳しく説明する',()=>other(p,false)],['挨拶だけして離れる',()=>{S.rep++;show('map')}]])}
+function layerTrap(p){
+ let P=people[p];
+ let cfg={
+  outdoor:{line:'「え……前のイベントから？」<br>雪奈の笑顔が一瞬だけ止まった。',thought:'（言い方。完全に言い方を間違えた。“見てました”は情報量が多い。）',recover:'「ごめんなさい、言い方変でした」と引く'},
+  indoor:{line:'「え、衣装には触らないでもらえると……」<br>りおが反射的に衣装を押さえた。',thought:'（当然だ。衣装は本人のものだ。俺はスタイリストじゃない。）',recover:'「すみません、触らないです」とすぐ謝る'},
+  rest:{line:'「今はほんとに休憩なので……」<br>みくは飲み物を持ったまま、困ったように笑った。',thought:'（“自然な感じ”って便利な言葉で休憩を撮影時間に変えるな、俺。）',recover:'「休憩優先で大丈夫です」と引く'},
+  east:{line:'「全部お任せだと、ちょっと困ります」<br>カレンは背景を見たまま、少し声の温度を下げた。',thought:'（こだわって場所を選んでる人に丸投げ。そりゃ雑に見える。）',recover:'「背景を活かしたいです」と意図を言い直す'},
+  entrance:{line:'「友達来たらそっち行くので……」<br>あやは入口の方を気にした。',thought:'（約束の時間を俺が延長する権利はない。二分が五分になるカメコ、信用ゼロ。）',recover:'「来たらすぐ終わります」と訂正する'}
+ }[p];
+ S.unease+=2;S.bond[p]=Math.max(-3,(S.bond[p]||0)-1);
+ story(p,P.name,cfg.line+'<br><span class="thought">'+cfg.thought+'</span>',[
+  [cfg.recover,()=>{S.backedOff++;S.rep++;S.unease=Math.max(0,S.unease-1);if(p==='outdoor')reijiEncounter();else other(p,true)}],
+  ['「いや、悪い意味じゃなくて」と説明を続ける',()=>{S.creep++;S.unease+=2;rude();refuse(p);story(p,P.name,'「……今日は撮影、大丈夫です」<br>会話を続けるほど、相手の表情が固くなっていった。<br><span class="thought">（説明すればするほど沈む沼ってあるんだな……。）</span>',[['ここで引く',()=>{S.backedOff++;show('map')}],['それでも撮影を頼む',()=>{recordWarningIncident(p,'固有の地雷を踏んだ後も撮影を迫る');endingBad('warning')} ]])}],
+  ['何も言わず一度離れる',()=>{S.backedOff++;show('map')}]
+ ]);
+}
 function direct(p){S.unease+=p==='rest'?3:1;if(rude())return;if(p==='outdoor'){reijiEncounter();return}other(p,false)}
 function other(p,good){let P=people[p];if(good){S.rep++;S.trust++;if(S.bond&&S.bond[p]!==undefined)S.bond[p]+=2;story(p,P.name,'「それなら大丈夫です。お願いします」<br><span class="thought">（よし。ここからはカメラで勝負だ。六枚、落ち着いて撮る。）</span>',[['撮影を始める',()=>startShoot(p)]])}else{S.unease++;refuse(p);story(p,P.name,'「あ……今日は大丈夫です」<br>笑顔のまま、一歩だけ距離を取られた。',[['すぐ引く',()=>{S.rep++;S.backedOff++;show('map')}],['「一分だけ」と食い下がる',()=>{recordPressure(p,'一分だけと食い下がる');S.creep++;S.unease++;story(p,P.name,'「すみません、本当に今日は大丈夫です」<br>今度ははっきり断られた。<br><span class="thought">（ここで引くか。それともまだ押すか……。）</span>',[['ここで引く',()=>{S.backedOff++;show('map')}],['さらに食い下がる',()=>{recordWarningIncident(p,'明確に断られた後もさらに迫る');endingBad('warning')} ]])} ]])}}
 function rumor(p){story(p,'マボ','相手は友人の方へ戻った。少し離れた場所で何か話している。<br><span class="thought">（俺のことじゃない。……たぶん。）</span>',[['その場を離れる',()=>show('map')]])}
@@ -646,10 +662,18 @@ function cameraEncounter(){
   story('rivals','カメコ遭遇','黒田、田中、リョウ、ヒデが機材の話で盛り上がっている。こちらに気づいた田中が手を上げた。<br>「おっ、マボさん。今日どこ回ってるんです？」<br><span class="thought">（ここでの振る舞いも、意外と界隈には残る……。）</span>',[
     ['普通に挨拶して情報交換する',()=>{S.camRep+=2;S.rep++;S.camMet.add('friendly');camEncounter2()}],
     ['撮った写真を見せて感想を聞く',()=>{S.camRep+=1;S.camMet.add('photos');camEncounter2()}],
+    ['撮影場所の取り方について黒田に一言言う',()=>cameraSquabble()],
     ['「レイヤーとしか話さない」と言う',()=>{S.camRep-=2;S.camMet.add('cold');camEncounter2()}],
     ['機材を馬鹿にしてマウントを取る',()=>{S.camRep-=3;S.rivalFlags++;S.camMet.add('hostile');if(S.camRep<=-5)return endingBad('camera');camEncounter2()}],
     ['会釈だけして離れる',()=>v4CompleteRivals()]
   ],IMG.tanaka)
+}
+function cameraSquabble(){
+ story('rivals','黒田','「さっき東側で撮ってた場所、次俺ら使うから。長居しないでね」<br>黒田が軽い口調で言う。<br>田中は苦笑い。リョウとヒデは反応を見ている。<br><span class="thought">（予約制でもないのに“俺ら使うから”か。腹は立つ。でもここで声をデカくしたら、負けるのは多分俺だ。）</span>',[
+  ['「空いたら声かけます」で流す',()=>{S.camRep+=2;S.rep++;story('rivals','田中','「それでいいっすよ。混んでるし譲り合いで」<br>田中が間に入り、空気がほどけた。<br><span class="thought">（勝ち負けじゃない。撮れればいい。……言い聞かせろ俺。）</span>',[['話を続ける',()=>camEncounter2()]])}],
+  ['「場所は早い者勝ちじゃないでしょ」と冷静に返す',()=>{S.camRep++;S.rivalFlags++;story('rivals','黒田','「まあ、それはそうだけどさ」<br>黒田は少し不満そうだが、それ以上は押してこなかった。<br><span class="thought">（言うことは言った。声量も上げてない。ギリ大人。）</span>',[['そのまま情報交換する',()=>camEncounter2()]])}],
+  ['「お前らがどけよ」と強く言う',()=>{S.camRep-=4;S.rivalFlags+=2;S.unease+=2;story('rivals','黒田','「は？ 何その言い方」<br>一気に空気が変わった。ヒデがスマホを触り、田中も笑わなくなった。<br><span class="thought">（やった。口から出た瞬間に分かるタイプの失敗だ。）</span>',[['謝って引く',()=>{S.camRep++;S.backedOff++;cameraResult()}],['さらに言い返す',()=>endingBad('camera')]])}]
+ ],IMG.kuroda)
 }
 function camEncounter2(){
   let lead=S.camRep>=2?'田中が少し嬉しそうにスマホを見せてきた。':'黒田がレンズを拭きながらこちらを見る。';
@@ -666,7 +690,7 @@ function cameraResult(){
   let effect=S.camRep>=4?'<br><br>その後、撮影しやすい場所や混雑状況を教えてもらえた。':S.camRep<=-3?'<br><br>離れたあと、背中越しに自分の名前が聞こえた。小さな悪評はこうして回るのかもしれない。':'';
   story('rivals','結果',t+effect,[['会場マップへ戻る',()=>v4CompleteRivals()]],S.camRep>=1?IMG.ryoji:IMG.hide)
 }
-function reijiEncounter(){story('outdoor','レイジ','「そのレンズ、F4ですか？」<br>横から大きなレンズを持ったカメコが入ってきた。レイジだ。<br>「俺、85mm F1.2なんですよね。こういう現場、機材で差が出るんで」', [['「へえ、すごいですね」で流す',()=>{S.rep++;reiji2()}],['負けずに自分の機材を語る',()=>{S.rivalFlags++;S.camRep--;S.unease++;reiji2()}],['雪奈に「今、撮影大丈夫ですか？」と確認する',()=>{S.trust+=2;S.bond.outdoor+=2;reiji2()}],['レイジと距離を置いて離れる',()=>show('map')]],REIJI_IMG)}
+function reijiEncounter(){story('outdoor','レイジ','「そのレンズ、F4ですか？」<br>横から大きなレンズを持ったカメコが入ってきた。レイジだ。<br>「俺、85mm F1.2なんですよね。こういう現場、機材で差が出るんで」<br><span class="thought">（来た。機材トークという名の踏み絵。乗るな、俺。雪奈の前で始める話じゃない。）</span>', [['「へえ、すごいですね」で流す',()=>{S.rep++;reiji2()}],['負けずに自分の機材を語る',()=>{S.rivalFlags++;S.camRep--;S.unease++;reiji2()}],['雪奈に「今、撮影大丈夫ですか？」と確認する',()=>{S.trust+=2;S.bond.outdoor+=2;reiji2()}],['レイジと距離を置いて離れる',()=>show('map')]],REIJI_IMG)}
 function reiji2(){story('outdoor','レイジ','レイジはそのまま話を続ける。<br>「俺、あのレイヤーともこのレイヤーとも知り合いでさ。雪奈ちゃんも前から知ってるよね？」<br>雪奈の表情がほんの少し固くなった。',[['「そうなんですね」とだけ返す',()=>shootGate()],['「俺も有名レイヤー知ってます」と乗る',()=>{S.rivalFlags++;S.camRep--;S.unease+=2;reijiBrag()}],['雪奈の反応を見て会話を切り上げる',()=>{S.trust+=2;S.bond.outdoor+=2;shootGate()}]],REIJI_IMG)}
 function reijiBrag(){story('outdoor','レイジ','「へえ、誰？ 有名ってどのへん？」<br>レイジが妙に食いついてきた。<br>雪奈の表情はさらに固くなる。<br><span class="thought">（まずい。完全に撮影じゃなくて人脈マウント大会になってる……。）</span>',[
 ['話を切り上げて雪奈に撮影確認する',()=>{S.trust++;S.bond.outdoor++;shootGate()}],
