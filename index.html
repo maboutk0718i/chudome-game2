@@ -372,9 +372,9 @@
 #preludeStart{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:min(78vw,340px);min-height:58px;border:1px solid #dfe8f0;border-radius:8px;background:#050505;color:#fff;font-size:18px;font-weight:800;letter-spacing:.08em;box-shadow:0 0 20px #ffffff18}
 #preludeStart:active{transform:translate(-50%,-50%) scale(.98)}
 #preludeText{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);text-align:center;color:#fff;font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(25px,7vw,42px);font-weight:700;letter-spacing:.08em;line-height:1.7;opacity:0;text-shadow:0 2px 12px #000;pointer-events:none}
-#preludeText.show{animation:preludeFade 2.5s ease-in-out forwards}
+#preludeText.show{animation:preludeFade 4s ease-in-out forwards}
 #preludeText.small{font-size:clamp(21px,6vw,34px)}
-@keyframes preludeFade{0%{opacity:0}22%{opacity:1}68%{opacity:1}100%{opacity:0}}
+@keyframes preludeFade{0%{opacity:0}28%{opacity:1}72%{opacity:1}100%{opacity:0}}
 #title.pretitleArrival .hero{animation:titleArrival .9s ease-out both}
 @keyframes titleArrival{from{opacity:0}to{opacity:1}}
 
@@ -416,7 +416,7 @@
 </div>
 
 <section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.12</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.13</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -677,8 +677,10 @@ function primeTitleBgm(){
    if(fullBgmKind!=='title'){
      a.pause();a.src=FULL_BGM.title;a.currentTime=0;fullBgmKind='title';
    }
-   a.muted=soundMuted;
-   a.volume=0;
+   /* iPhone Safari対策：前口上中は音量0ではなくミュートで完全消音する。
+      最初のタップで再生だけ開始しておき、タイトル表示時にミュート解除する。 */
+   a.muted=true;
+   a.volume=.96*masterVolume;
    let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true});
  }catch(e){audioNeedsResume=true}
 }
@@ -689,7 +691,7 @@ function showPreludeLine(html,small=false){
    t.innerHTML=html;
    void t.offsetWidth;
    t.classList.add('show');
-   setTimeout(()=>{t.classList.remove('show');resolve()},2500);
+   setTimeout(()=>{t.classList.remove('show');resolve()},4000);
  });
 }
 async function runTitlePrelude(){
@@ -697,9 +699,9 @@ async function runTitlePrelude(){
  preludeRunning=true;
  const b=$('#preludeStart');if(b){b.disabled=true;b.style.opacity='0';b.style.pointerEvents='none'}
  await showPreludeLine('MABOX presents',true);
- await new Promise(r=>setTimeout(r,260));
+ await new Promise(r=>setTimeout(r,650));
  await showPreludeLine('そして、ちゅどーむへ——');
- await new Promise(r=>setTimeout(r,280));
+ await new Promise(r=>setTimeout(r,700));
  first=true;
  const title=$('#title');if(title)title.classList.add('pretitleArrival');
  show('title');
