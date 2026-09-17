@@ -343,20 +343,15 @@
 .resultCard{margin:15px 0;padding:14px;border:2px solid #d6c36a;background:#111820;border-radius:10px;line-height:1.8}.resultCard h3{color:#ffe082}.rankBig{font-size:36px;font-weight:900;color:#ffe082;text-align:center}
 </style>
 <style id="audioControlStyle">
-.audioControl{position:fixed;z-index:9999;top:calc(58px + env(safe-area-inset-top,0px));right:8px;display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid #ffffff55;border-radius:12px;background:#020812e8;backdrop-filter:blur(8px);box-shadow:0 3px 12px #0008;font-size:12px}
-.audioControl button{width:42px;height:42px;border:1px solid #8fc8ef;border-radius:9px;background:#0b3152;color:#fff;font-size:20px;padding:0;display:grid;place-items:center}
-.audioControl label{display:flex;align-items:center;gap:6px;color:#eef7ff;font-weight:700;white-space:nowrap}
-.audioControl input[type=range]{width:105px;accent-color:#8fc8ef}
-.audioControl .volText{min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
-@media(max-width:390px){.audioControl{gap:5px;padding:6px}.audioControl label>span:first-child{display:none}.audioControl input[type=range]{width:86px}.audioControl .volText{min-width:30px}}
+.audioControl{position:fixed;z-index:9999;top:calc(58px + env(safe-area-inset-top,0px));right:8px;padding:6px;border:1px solid #ffffff55;border-radius:12px;background:#020812e8;backdrop-filter:blur(8px);box-shadow:0 3px 12px #0008}
+.audioControl button{width:44px;height:44px;border:1px solid #8fc8ef;border-radius:9px;background:#0b3152;color:#fff;font-size:20px;padding:0;display:grid;place-items:center}
 </style>
 </head><body>
-<div class="audioControl" id="audioControl" aria-label="音量コントロール">
-  <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替">🔊</button>
-  <label for="volumeSlider"><span>音量</span><input id="volumeSlider" type="range" min="0" max="100" step="1" value="100" aria-label="音量"><span class="volText" id="volumeText">100%</span></label>
+<div class="audioControl" id="audioControl" aria-label="サウンド切替">
+  <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 5.8</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 5.9</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -524,15 +519,12 @@ function show(id){$$('.screen').forEach(x=>x.classList.remove('active'));$('#'+i
 let masterVolume=1,soundMuted=false;
 function applyMasterAudio(){
   if(fullBgm){fullBgm.muted=soundMuted;const base=(fullBgmKind==='happy'||fullBgmKind==='bad')?.82:.96;fullBgm.volume=Math.max(0,Math.min(1,base*masterVolume));}
-  const mb=document.getElementById('muteBtn'),vs=document.getElementById('volumeSlider'),vt=document.getElementById('volumeText');
-  if(mb){mb.textContent=(soundMuted||masterVolume<=0)?'🔇':'🔊';mb.setAttribute('aria-pressed',soundMuted?'true':'false');}
-  if(vs && document.activeElement!==vs)vs.value=String(Math.round(masterVolume*100));
-  if(vt)vt.textContent=Math.round(masterVolume*100)+'%';
+  const mb=document.getElementById('muteBtn');
+  if(mb){mb.textContent=soundMuted?'🔇':'🔊';mb.setAttribute('aria-pressed',soundMuted?'true':'false');mb.title=soundMuted?'ミュート解除':'ミュート';}
 }
 function initAudioControls(){
-  const mb=document.getElementById('muteBtn'),vs=document.getElementById('volumeSlider');
-  if(mb)mb.addEventListener('click',()=>{soundMuted=!soundMuted;applyMasterAudio();});
-  if(vs)vs.addEventListener('input',()=>{masterVolume=Math.max(0,Math.min(1,Number(vs.value)/100));if(masterVolume>0)soundMuted=false;applyMasterAudio();});
+  const mb=document.getElementById('muteBtn');
+  if(mb)mb.addEventListener('click',e=>{e.stopPropagation();soundMuted=!soundMuted;applyMasterAudio();});
   applyMasterAudio();
 }
 function newAudioContext(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;return new C()}catch(e){return null}}
@@ -600,7 +592,21 @@ function shotFx(){
  }catch(e){}
 }
 try{let old=$('#secondLoopBtn');if(old)old.remove()}catch(e){}
-$('#titleTap').onclick=e=>{if(e.target.id!=='press')return};$('#press').onclick=e=>{e.stopPropagation();unlock();first=true;click();theme('talk');show('intro')};$('#toMap').onclick=()=>{click();theme('field');show('map')};
+$('#titleTap').onclick=e=>{if(e.target.id!=='press')return};
+$('#press').onclick=e=>{
+ e.stopPropagation();
+ unlock();
+ click();
+ if(!first){
+   first=true;
+   theme('title');
+   e.currentTarget.textContent='ゲームをはじめる';
+   return;
+ }
+ theme('talk');
+ show('intro');
+};
+$('#toMap').onclick=()=>{click();theme('field');show('map')};
 const POSEEX={'indoor1':'poses/embedded_12e3e0347a81f493.jpg','indoor2':'poses/embedded_db5451acc02e6ce0.jpg','indoor3':'poses/embedded_06bd55f295980a04.jpg','indoor4':'poses/embedded_74c44ec11dff802f.jpg','indoor5':'poses/embedded_ec387501e1921362.jpg','indoor6':'poses/embedded_43883657f4e3533b.jpg','rest1':'poses/embedded_95754dee0563b767.jpg','rest2':'poses/embedded_6d8f2aa7567df653.jpg','rest3':'poses/embedded_6a3b2d4a8975050d.jpg','rest4':'poses/embedded_ea04b0bd263cdfb9.jpg','rest5':'poses/embedded_e314800c94a52711.jpg','rest6':'poses/embedded_3b68d46d434ffe2d.jpg','east1':'poses/embedded_a97b79117b9712f9.jpg','east2':'poses/embedded_f1d60535c7b31abc.jpg','east3':'poses/embedded_6470fc572d17a74a.jpg','east4':'poses/embedded_7cad38153dfd5157.jpg','east5':'poses/embedded_08c11f4637a9fab6.jpg','east6':'poses/embedded_8daa2f41b7cea9c6.jpg','entrance1':'poses/embedded_a90be8c85363bed3.jpg','entrance2':'poses/embedded_25848347a845d202.jpg','entrance3':'poses/embedded_72436521b986ab1a.jpg','entrance4':'poses/embedded_a0a62ec89ffe4b57.jpg','entrance5':'poses/embedded_0c0bdd7b4d8964bc.jpg','entrance6':'poses/embedded_e9344654db54ee62.jpg'};
 const people={outdoor:{name:'雪奈',img:IMG.yukina,label:'屋外エリア',intro:'白と青の衣装の雪奈が、友人と別れて撮影場所を探している。'},indoor:{name:'りお',img:IMG.rio,label:'屋内壁際',intro:'黒い衣装のりおがスマホを確認している。'},rest:{name:'みく',img:IMG.miku,label:'休憩スペース',intro:'みくが飲み物を手に座っている。明らかに休憩中だ。'},east:{name:'カレン',img:IMG.karen,label:'東側エリア',intro:'カレンが背景と光を確かめている。撮影へのこだわりが強そうだ。'},entrance:{name:'あや',img:IMG.aya,label:'入口付近',intro:'あやが入口で友人を待っている。'}};
 const ENDIMG={"end_bad_room": "poses/embedded_1328842a0199a677.jpg", "end_bad_sns": "poses/embedded_c09ded6e645a1cff.jpg", "end_good_venue": "poses/embedded_f0d8992119de1749.jpg", "end_good_sns": "poses/embedded_a41e77553da29fe8.jpg"};
@@ -618,11 +624,14 @@ function visit(p){
  let P=people[p];S.met.add(p);
  if(S.shotDone.has(p)){postShootVisit(p);return}
  if(S.refused.has(p)){story(p,P.name,P.intro+'<br><span class="thought">（この人には一度撮影を断られている。今日はもう撮影をお願いしない。）</span>',[['挨拶だけする',()=>{S.rep++;show('map')}],['静かにその場を離れる',()=>show('map')],['マップへ戻る',()=>show('map')]]);return}
- if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（雪奈の近くにはレイジもいる。まず空気を見るか、先に声を掛けるか。）</span>',[['レイジの様子を先に見る',()=>observe(p)],['雪奈に短く挨拶する',()=>talk(p)],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（いきなりカメラを向けるのは違う。まず、どう入る……？）</span>',[['脳内で声かけを3回リハーサルする',()=>yukinaRehearsal()],['雪奈に短く挨拶する',()=>talk(p)],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],['マップへ戻る',()=>show('map')]]);return}
  if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。衣装の意図から聞くか、撮影イメージから入るか。）</span>',[['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['いきなり撮影をお願いする',()=>direct('indoor')],['マップへ戻る',()=>show('map')]]);return}
  if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここは撮影より、相手の時間を優先する場面だ。）</span>',[['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],['今すぐ一枚だけお願いする',()=>direct('rest')],['マップへ戻る',()=>show('map')]]);return}
  if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしていそうだ。）</span>',[['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['機材の性能をアピールする',()=>direct('east')],['マップへ戻る',()=>show('map')]]);return}
  story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝えよう。）</span>',[['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],['すぐ撮影をお願いする',()=>direct('entrance')],['マップへ戻る',()=>show('map')]])
+}
+function yukinaRehearsal(){
+ story('outdoor','マボ','<span class="thought">（こんにちは、撮影いいですか？ ……固い。<br>こんにちは！ 一枚お願いしても……いや距離近い。<br>あの、もしよければ……って何に“もし”だよ俺。）</span><br><br>三回練習した結果、最初の一言すら分からなくなった。',[['結局、普通に「こんにちは」と言う',()=>{S.rep++;talk('outdoor')}],['もう一回だけ脳内会議する',()=>{S.unease++;story('outdoor','マボ','<span class="thought">（四回目。今度こそ完璧に……。）</span><br>雪奈と目が合った。<br><span class="thought">（終わった。もう行くしかない。）</span>',[['腹をくくって声を掛ける',()=>talk('outdoor')],['いったんマップへ戻る',()=>show('map')]])}],['いったん離れる',()=>show('map')]])
 }
 function observe(p){S.trust++;if(S.bond&&S.bond[p]!==undefined)S.bond[p]++;let tx=p==='rest'?'休憩が終わるまで距離を取った。しばらくして、みくが立ち上がる。':p==='east'?'カレンは背景をかなり気にしている。撮るなら構図を雑にしない方がよさそうだ。':'相手の手が空いた。今なら声を掛けても不自然ではなさそうだ。';story(p,'マボ',tx+'<br><span class="thought">（今だ。……いや、今だよな？ 三秒待つ？ 待ちすぎ？）</span>',[['声を掛ける',()=>talk(p)],['今日は離れる',()=>{S.rep++;show('map')}]])}
 function talk(p){let P=people[p];if(p==='outdoor'){story(p,'雪奈','「こんにちは。撮影ですか？」<br>雪奈は普通に返してくれた。普通だ。ここで普通を壊すな。',[['衣装の工夫について聞く',()=>{S.trust+=2;S.bond.outdoor+=2;reijiEncounter()}],['「SNSずっと見てました」と伝える',()=>{S.creep+=2;S.unease+=2;if(!rude())reijiEncounter()}],['まず短く撮影をお願いする',()=>{S.trust++;S.bond.outdoor++;reijiEncounter()}],['一度離れる',()=>show('map')]]);return}let special=p==='rest'?'「今休憩中なので……」':p==='east'?'「どんな雰囲気で撮る予定ですか？」':p==='entrance'?'「友達待ってるんですけど、少しなら」':'「ここなら少し空いてますね」';story(p,P.name,special,[['相手の希望と時間を先に聞く',()=>other(p,true)],['自分の機材と撮影歴を詳しく説明する',()=>other(p,false)],['挨拶だけして離れる',()=>{S.rep++;show('map')}]])}
@@ -826,6 +835,9 @@ function resetTitleScreen(){
   currentTheme=null;
   first=false;
   audioNeedsResume=false;
+  if(fullBgm){try{fullBgm.pause();fullBgm.currentTime=0}catch(e){}}
+  fullBgmWanted='';
+  fullBgmKind='';
 
   // 2周目に前回の「撮影済」「撮影NG」などを持ち越さない
   S=freshGameState();
