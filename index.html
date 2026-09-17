@@ -339,7 +339,7 @@
 
 
 /* Ver.6.6 graphic-safe rendering */
-.art,.shootView,.thumb,.venueStage,.mapNpc,.mapNpc .mapFace,.endGallery img,.storyGallery img{overflow:hidden!important}
+.art,.shootView,.thumb,.venueStage,.mapNpc .mapFace,.endGallery img,.storyGallery img{overflow:hidden!important}
 .art>img,#sceneImg,#camImg,.thumb img,.endGallery img,.storyGallery img,.mapNpc .mapFace{display:block;max-width:none!important;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 #shoot .shootView{contain:layout paint style!important;isolation:isolate!important}
 #shoot .shootView #camImg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
@@ -352,7 +352,7 @@
 #sceneImg.loop2IntroCrop{transform:scale(1.38)!important;transform-origin:50% 0!important;object-position:center top!important}
 
 /* Ver.6.6 graphic-safe rendering */
-.art,.shootView,.thumb,.venueStage,.mapNpc,.mapNpc .mapFace,.endGallery img,.storyGallery img{overflow:hidden!important}
+.art,.shootView,.thumb,.venueStage,.mapNpc .mapFace,.endGallery img,.storyGallery img{overflow:hidden!important}
 .art>img,#sceneImg,#camImg,.thumb img,.endGallery img,.storyGallery img,.mapNpc .mapFace{display:block;max-width:none!important;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 #shoot .shootView{contain:layout paint style!important;isolation:isolate!important}
 #shoot .shootView #camImg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
@@ -375,18 +375,26 @@
 .audioControl button{width:44px;height:44px;border:1px solid #8fc8ef;border-radius:9px;background:#0b3152;color:#fff;font-size:20px;padding:0;display:grid;place-items:center}
 </style>
 
-<style id="mapFaceNoCropV610">
-/* Ver.6.10: do not crop venue-map portraits */
+<style id="mapFaceNoCropV611">
+/* Ver.6.11: venue-map portraits must never be clipped by the NPC button */
+.mapNpc{
+  overflow:visible!important;
+}
 .mapNpc .mapFace{
+  top:6px!important;
   object-fit:contain!important;
-  object-position:center center!important;
-  padding:8px!important;
+  object-position:center top!important;
+  padding:10px 8px 6px!important;
   box-sizing:border-box!important;
   background:#0b1723!important;
   overflow:hidden!important;
+  border-radius:50%!important;
 }
 @media(max-width:390px){
-  .mapNpc .mapFace{padding:6px!important}
+  .mapNpc .mapFace{
+    top:5px!important;
+    padding:8px 6px 5px!important;
+  }
 }
 </style>
 </head><body>
@@ -394,7 +402,7 @@
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.10</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.11</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
