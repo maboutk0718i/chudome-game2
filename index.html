@@ -345,6 +345,12 @@
 #shoot .shootView #camImg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
 #story .art,#intro .art,#shoot .shootView,.venueStage,.endGallery,.storyGallery{position:relative!important}
 
+
+/* Ver.6.8: map portrait safe crop + second-loop intro crop */
+.mapNpc .mapFace{object-fit:cover!important;object-position:center 12%!important}
+.mapNpc[data-place="indoor"] .mapFace{object-position:center 16%!important}
+#sceneImg.loop2IntroCrop{transform:scale(1.38)!important;transform-origin:50% 0!important;object-position:center top!important}
+
 </style><style>
 .v2status{margin-top:7px;padding:7px 9px;border:1px solid #66727d;border-radius:7px;background:#111a22;color:#edf4f8;font-size:12px}
 .v2status b{color:#ffe082}.v2event{margin:8px 0;padding:8px;border-left:4px solid #d6c36a;background:#1a222b;font-size:13px}
@@ -359,7 +365,7 @@
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.7</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.8</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -436,14 +442,14 @@
 <section id="rivalGallery" class="screen"><div class="top"><b>会場のカメコたち</b><span>要注意</span></div><div class="rivalStrip"><div class="rivalCard"><img src="poses/kuroda.png"><b>黒田</b>機材マウント型</div><div class="rivalCard"><img src="poses/tanaka.png"><b>田中</b>知り合い自慢型</div><div class="rivalCard"><img src="poses/ryo.png"><b>リョウ</b>距離感バグ型</div><div class="rivalCard"><img src="poses/hide.png"><b>ヒデ</b>写真見せつけ型</div></div><div class="dialog"><span class="speaker">マボ</span><br>会場には色々なカメラマンがいる。<br><span class="thought">（俺は……あいつらとは違う。たぶん。違うよな？）</span></div><div class="cmds"><button class="cmd" id="rivalBack">マップへ戻る</button></div></section>
 <section id="shoot" class="screen"><div class="shootView"><img id="camImg" src="poses/embedded_cb2d18490e0ae63f.jpg"><div class="hud"><div class="remaining" id="remain">あと 6 / 6 枚</div><div class="focus" id="focus"></div><div class="flash" id="flash"></div></div></div><div class="shootCtl"><button data-cam="left">◀ 左へ</button><button data-cam="pose">ポーズを待つ</button><button data-cam="right">右へ ▶</button><button data-cam="in">寄る</button><button data-cam="center">中央</button><button data-cam="out">引く</button><div class="countBig" id="countBig">あと 6 / 6 枚</div><div class="shutterWrap"><button class="shutter" id="shutter">SHUTTER</button></div></div></section>
 <section id="select" class="screen"><div class="top"><b id="selectTitle">写真を選ぶ</b><span id="selectSub">1枚選択</span></div><div class="dialog" id="selectDialog">撮影した六枚から一枚を選ぶ。</div><div class="selectGrid" id="selectGrid"></div><div class="cmds"><button class="cmd" id="sendPhoto">この写真を選ぶ</button></div></section>
-<section id="end" class="screen"><div class="endScene" id="ending"><small id="endDay">翌日</small><h1 id="endTitle"></h1><div id="endBody"></div><button class="restart" id="restart">タイトルへ戻る</button></div></section>
+<section id="end" class="screen"><div class="endScene" id="ending"><small id="endDay">翌日</small><h1 id="endTitle"></h1><div id="endBody"></div><button class="restart" id="restart">タイトルに戻る</button></div></section>
 <script>const V47POSE={'rest0':'poses/rest0.jpg','rest1':'poses/rest1.jpg','rest2':'poses/rest2.jpg','rest3':'poses/rest3.jpg','rest4':'poses/rest4.jpg','rest5':'poses/rest5.jpg?v=53','outdoor0':'poses/outdoor0.jpg','outdoor1':'poses/outdoor1.jpg','outdoor2':'poses/outdoor2.jpg','outdoor3':'poses/outdoor3.jpg','outdoor4':'poses/outdoor4.jpg','outdoor5':'poses/outdoor5.jpg?v=53','indoor0':'poses/indoor0.jpg','indoor1':'poses/indoor1.jpg','indoor2':'poses/indoor2.jpg','indoor3':'poses/indoor3.jpg','indoor4':'poses/indoor4.jpg','indoor5':'poses/indoor5.jpg?v=53','east0':'poses/east0.jpg','east1':'poses/east1.jpg','east2':'poses/east2.jpg','east3':'poses/east3.jpg','east4':'poses/east4.jpg','east5':'poses/east5.jpg?v=53','entrance0':'poses/entrance0.jpg','entrance1':'poses/entrance1.jpg','entrance2':'poses/entrance2.jpg','entrance3':'poses/entrance3.jpg','entrance4':'poses/entrance4.jpg','entrance5':'poses/entrance5.jpg?v=53'};
 const V45POSE={'outdoor0':'poses/embedded_2f582250612cc3f1.jpg','outdoor1':'poses/embedded_88d1677c219cda16.jpg','outdoor2':'poses/embedded_dc9e4a340e0660cf.jpg','outdoor3':'poses/embedded_c32aa5d4e128bb3e.jpg','outdoor4':'poses/embedded_1de2cf3eea54d077.jpg','outdoor5':'poses/embedded_2c001998abead047.jpg','indoor0':'poses/embedded_9f8b6fa330abebda.jpg','indoor1':'poses/embedded_1eb273e04d5c9083.jpg','indoor2':'poses/embedded_5ad536326a610aae.jpg','indoor3':'poses/embedded_b2c33bd7d42b3acb.jpg','indoor4':'poses/embedded_fbc0659e3d1e0382.jpg','indoor5':'poses/embedded_053d44dc69d808ed.jpg','rest0':'poses/embedded_6a53d1d6f0e52897.jpg','rest1':'poses/embedded_6b69d624cb753b18.jpg','rest2':'poses/embedded_32a0cd5d702c983d.jpg','rest3':'poses/embedded_1c5710d21682d221.jpg','rest4':'poses/embedded_ae7688fc0afea63a.jpg','rest5':'poses/embedded_b1108806ac67dc98.jpg','east0':'poses/embedded_d5399d2dfa66c0f0.jpg','east1':'poses/embedded_e1aa1934fdab190a.jpg','east2':'poses/embedded_179b9393548c39aa.jpg','east3':'poses/embedded_f26d3487acf98cef.jpg','east4':'poses/embedded_cbddc1d3b3212edb.jpg','east5':'poses/embedded_0ebe3eefcc7d2af6.jpg','entrance0':'poses/embedded_2bac91982aa512d0.jpg','entrance1':'poses/embedded_48b5f804de71c980.jpg','entrance2':'poses/embedded_4fae563f03dbc6de.jpg','entrance3':'poses/embedded_7feb868021aca02a.jpg','entrance4':'poses/embedded_539244a43f82bdd5.jpg','entrance5':'poses/embedded_6449b410ff493f2e.jpg'};
 const V44POSE={'outdoor1':'poses/embedded_e18c4f05a0b5dc6c.jpg','outdoor2':'poses/embedded_942c6caf46e3049b.jpg','outdoor3':'poses/embedded_974a00dcf8defa37.jpg','outdoor4':'poses/embedded_f99c7f37fd9224d9.jpg','outdoor5':'poses/embedded_d2919128f391b869.jpg','outdoor6':'poses/embedded_cfe03040cbc574b0.jpg','indoor1':'poses/embedded_8f0fe7ab1baa9110.jpg','indoor2':'poses/embedded_70ceca1df7a8daca.jpg','indoor3':'poses/embedded_ae30efbc31b2b78a.jpg','indoor4':'poses/embedded_b5c704477bf6891d.jpg','indoor5':'poses/embedded_8e2483a8183b2720.jpg','indoor6':'poses/embedded_74a16ed962893773.jpg','rest1':'poses/embedded_bcf4023db6002291.jpg','rest2':'poses/embedded_d4e00d02611397e3.jpg','rest3':'poses/embedded_d5f5fcedf1eaa71b.jpg','rest4':'poses/embedded_d0740137057c227e.jpg','rest5':'poses/embedded_6c1284f33a074b0e.jpg','rest6':'poses/embedded_527c5758b771a10a.jpg','east1':'poses/embedded_f28ff4f82de43dc0.jpg','east2':'poses/embedded_048c98b4eebb593b.jpg','east3':'poses/embedded_b983ef9cde02db66.jpg','east4':'poses/embedded_0970ded0bb0d2685.jpg','east5':'poses/embedded_53a7d93b6daf7d68.jpg','east6':'poses/embedded_b6db20553c934bda.jpg','entrance1':'poses/embedded_cd1c0681b07d25e3.jpg','entrance2':'poses/embedded_c0544ebf958d8e86.jpg','entrance3':'poses/embedded_7779276b5a45134a.jpg','entrance4':'poses/embedded_9162feebecb8f94c.jpg','entrance5':'poses/embedded_126ed40afb1311de.jpg','entrance6':'poses/embedded_474efd2bc244ef4b.jpg'};
 const V41POSE={'outdoor1':'poses/embedded_e43c59a4dcc30fe2.jpg','outdoor2':'poses/embedded_1dd6948370208c47.jpg','outdoor3':'poses/embedded_fc8cda00fbe34c61.jpg','outdoor4':'poses/embedded_b58a33da676ae206.jpg','outdoor5':'poses/embedded_60ecb4e709d454c9.jpg','outdoor6':'poses/embedded_daf9bed950ce47eb.jpg','indoor1':'poses/embedded_50dd82f405d5e851.jpg','indoor2':'poses/embedded_d1aa39cc133386ad.jpg','indoor3':'poses/embedded_76c0fd3b57da6e9d.jpg','indoor4':'poses/embedded_cf98a96e047e40f5.jpg','indoor5':'poses/embedded_643a14934ebc1dad.jpg','indoor6':'poses/embedded_9c8a1ab9e2d30f20.jpg','rest1':'poses/embedded_7dcaca8a08111c8b.jpg','rest2':'poses/embedded_c4f5ffc6e5d5e88c.jpg','rest3':'poses/embedded_70ae96ccab5690fe.jpg','rest4':'poses/embedded_07fb0d384175e409.jpg','rest5':'poses/embedded_18e1faad81a70fb6.jpg','rest6':'poses/embedded_9fb1c4515918a9d8.jpg','east1':'poses/embedded_8cfd68cbb7cc3aef.jpg','east2':'poses/embedded_60322348a4db3d22.jpg','east3':'poses/embedded_7371cd2be2d2e86f.jpg','east4':'poses/embedded_873a3374f91339ab.jpg','east5':'poses/embedded_c4b2eefb443d9ea1.jpg','east6':'poses/embedded_ac4ac298fe5db8aa.jpg','entrance1':'poses/embedded_eb039433ba799733.jpg','entrance2':'poses/embedded_4bdfd16edab4d9b2.jpg','entrance3':'poses/embedded_65ca157a91f79a90.jpg','entrance4':'poses/embedded_01dd025d8b9bd171.jpg','entrance5':'poses/embedded_52293490bd73002e.jpg','entrance6':'poses/embedded_779a475a92348644.jpg'};
 
 const IMG={"title": "poses/embedded_502aa07988d33113.jpg", "venue": "poses/embedded_2fe3d4ea4c6bcb65.jpg", "indoor": "poses/embedded_974b4c628d01a3d2.jpg", "yukina": "poses/embedded_9788354d56372ea3.jpg", "rio": "poses/embedded_0cf3459683e24d68.jpg", "miku": "poses/embedded_5b27f66ca346d977.jpg", "karen": "poses/embedded_c300abcb515b2682.jpg", "aya": "poses/embedded_855399f589fa2274.jpg", "kuroda": "poses/kuroda.png", "tanaka": "poses/tanaka.png", "ryoji": "poses/ryo.png", "hide": "poses/hide.png", "pose1": "poses/embedded_cb2d18490e0ae63f.jpg", "pose2": "poses/embedded_2f100ba8f1202c6a.jpg", "pose3": "poses/embedded_bf533ab554b7e6ec.jpg", "pose4": "poses/embedded_10cf7f527e3cb319.jpg", "pose5": "poses/embedded_3bde0dc7864a6ddd.jpg", "pose6": "poses/embedded_1a94f2c3517cccd0.jpg"}; const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let AC=null,timer=null,first=false,currentTheme=null,audioNeedsResume=false;
-function freshGameState(){return {trust:0,unease:0,rep:0,creep:0,shots:[],selected:null,cam:null,met:new Set(),rivalFlags:0,photo:0,shotDone:new Set(),rude:0,refused:new Set(),currentShoot:null,photoScores:{},bond:{outdoor:0,indoor:0,rest:0,east:0,entrance:0},pushAfterNo:0,backedOff:0,pressureLog:[],warningIncidents:[],timeMin:600,visitCount:{},randomSeen:new Set(),eventLog:[],secondLoop:false,loop:1,priorRefused:new Set(),priorShot:new Set(),priorBond:{outdoor:0,indoor:0,rest:0,east:0,entrance:0},priorCamRep:0,camRep:0,camMet:new Set(),camHostile:false,v4RivalsComplete:false,v4ClosingShown:false}}let S=freshGameState();
+function freshGameState(){return {trust:0,unease:0,rep:0,creep:0,shots:[],selected:null,cam:null,met:new Set(),rivalFlags:0,photo:0,shotDone:new Set(),rude:0,refused:new Set(),currentShoot:null,photoScores:{},bond:{outdoor:0,indoor:0,rest:0,east:0,entrance:0},pushAfterNo:0,backedOff:0,pressureLog:[],warningIncidents:[],timeMin:600,visitCount:{},randomSeen:new Set(),eventLog:[],secondLoop:false,loop:1,priorRefused:new Set(),priorShot:new Set(),priorMet:new Set(),priorBond:{outdoor:0,indoor:0,rest:0,east:0,entrance:0},priorCamRep:0,camRep:0,camMet:new Set(),camHostile:false,v4RivalsComplete:false,v4ClosingShown:false}}let S=freshGameState();
 
 function v4AllShot(){return ['outdoor','indoor','rest','east','entrance'].every(p=>S.shotDone.has(p))}
 function v4SetProgressTime(){
@@ -466,31 +472,27 @@ function v2Status(){let e=$('#v2status');if(!e)return;let r=layerRepScore();let 
 function v2Propagation(p){let a=[...S.shotDone].filter(x=>x!==p);if(a.length&&S.rep>=2){let n=people[a[0]]?.name||'別のレイヤー';return '<div class="v2event">💬 「さっき'+n+'さんを撮ってましたよね」<br>会場内で少しずつ名前が伝わっている。</div>'}if(S.unease>=3||S.rude>=2)return '<div class="v2event">💬 一瞬だけ警戒するような視線を感じる。会場では行動も人づてに伝わる。</div>';return ''}
 function v2Result(){let a=Object.values(S.photoScores),avg=a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;let tech=Math.max(0,Math.min(100,avg)),comm=Math.max(0,Math.min(100,50+(S.trust+S.rep)*8-S.unease*6)),dist=Math.max(0,Math.min(100,80+S.backedOff*6-S.creep*12-S.rude*8-S.warningIncidents.length*40)),cam=Math.max(0,Math.min(100,55+S.camRep*8-S.rivalFlags*4)),total=Math.round((tech+comm+dist+cam)/4),grade=total>=90?'S':total>=80?'A':total>=70?'B':total>=60?'C':total>=45?'D':'E';if(!v4AllShot()&&(grade==='S'||grade==='A'))grade='B';return {avg,tech,comm,dist,cam,total,grade}}
 function v2ResultHTML(){let r=v2Result();return '<div class="resultCard"><h3>本日のカメコ評価</h3><div class="rankBig">'+r.grade+'</div><div>撮影技術：'+r.tech+'　コミュ力：'+r.comm+'<br>距離感：'+r.dist+'　カメコ評判：'+r.cam+'<br>撮影人数：'+S.shotDone.size+'/5　写真平均：'+r.avg+'点<br>終了時刻：'+v2Clock()+'　総合：'+r.total+'</div><p><b>野良カメコ Lv.'+Math.max(1,Math.floor(r.total/10))+'</b></p></div>'}
-function v2Finalize(){let b=$('#endBody');if(b&&!b.querySelector('.resultCard'))b.insertAdjacentHTML('beforeend',v2ResultHTML());let rb=$('#restart');if(rb)rb.textContent=S.loop===1?'次のちゅどーむへ':'タイトルへ戻る';try{localStorage.setItem('chudomeCleared','1')}catch(e){}}
+function v2Finalize(){let b=$('#endBody');if(b&&!b.querySelector('.resultCard'))b.insertAdjacentHTML('beforeend',v2ResultHTML());let rb=$('#restart');if(rb)rb.textContent=S.loop===1?'次のちゅどーむへ':'タイトルに戻る';try{localStorage.setItem('chudomeCleared','1')}catch(e){}}
 function v2SecondLoop(){unlock();S=freshGameState();S.secondLoop=true;S.rep=1;S.trust=1;theme('talk');show('intro')}
 
 
 
 
 function v47SyncMapFaces(){
- const pick={outdoor:5,indoor:5,rest:5,east:5,entrance:5};
- Object.keys(pick).forEach(p=>{
+ const faceSrc={outdoor:IMG.yukina,indoor:IMG.rio,rest:IMG.miku,east:IMG.karen,entrance:IMG.aya};
+ Object.keys(faceSrc).forEach(p=>{
    let el=document.querySelector('.mapNpc[data-place="'+p+'"] .mapFace');
-   if(el){
-     const src=(p==='indoor')?'poses/embedded_058c90fae66e28a4.jpg':V47POSE[p+pick[p]];
-     if(el.tagName==='IMG') el.src=src;
-     else el.style.backgroundImage='url("'+src+'")';
-   }
+   if(el&&faceSrc[p]){el.src=faceSrc[p];el.removeAttribute('srcset')}
  });
 }
 
 function initVenueMap(){
  const faceSrc={
-   entrance:'poses/entrance5.jpg',
-   outdoor:'poses/outdoor5.jpg',
-   rest:'poses/rest5.jpg',
-   east:'poses/east5.jpg',
-   indoor:'poses/embedded_058c90fae66e28a4.jpg',
+   entrance:IMG.aya,
+   outdoor:IMG.yukina,
+   rest:IMG.miku,
+   east:IMG.karen,
+   indoor:IMG.rio,
    rivals:(IMG.kuroda||IMG.tanaka)
  };
  $$('[data-area-face]').forEach(im=>{
@@ -533,6 +535,7 @@ function show(id){
    if(seq!==showSeq||!target)return;
    target.classList.add('active');
    if(id==='map'){updateShotStatus();v2Status();setTimeout(initVenueMap,0);if(S.timeMin>=900){setTimeout(v4Closing,50);return}if(AC)theme('field')}
+   if(id==='end')setTimeout(()=>{try{v2Finalize()}catch(e){console.error(e)}},0);
    scrollTo(0,0);
  };
  // 画像を差し替える画面は1フレーム待ち、前の画像が一瞬見えるのを防ぐ
@@ -654,7 +657,7 @@ function rivalSpeakerImage(sp){
  return IMG.kuroda;
 }
 function story(p,sp,text,choices,img){
- $('#sceneImg').classList.remove('cleanVenueCrop');
+ $('#sceneImg').classList.remove('cleanVenueCrop','loop2IntroCrop');
  let P=people[p]||people.outdoor;
  let sceneSrc=img||(['outdoor','indoor','rest','east','entrance'].includes(p)?V47POSE[p+'5']:(p==='rivals'?rivalSpeakerImage(sp):P.img));
  let camScene=p==='rivals'||sceneSrc===REIJI_IMG||sceneSrc===IMG.kuroda||sceneSrc===IMG.tanaka||sceneSrc===IMG.ryoji||sceneSrc===IMG.hide;
@@ -804,12 +807,55 @@ function loop2ShootOffer(p){
   ['「前回と同じ感じで」とすぐ撮り始める',()=>{S.unease++;S.bond[p]--;story(p,P.name,'「今日は前回とちょっと変えたいんですけど……」<br><span class="thought">（二回目なのに、一回目の記憶に甘えた。）</span>',[['希望を聞き直す',()=>{S.trust++;startShoot(p)}],['今日はやめておく',()=>show('map')]])}]
  ]);
 }
+function loop2FirstMeet(p){
+ const P=people[p];
+ const intro=P.intro+'<br><span class="thought">（この人とは前回話していない。二周目の俺には見覚えがあっても、向こうにとっては今日が初対面だ。）</span>';
+ if(p==='outdoor'){
+  story(p,'マボ',intro,[
+   ['雪奈に短く挨拶する',()=>talk(p)],
+   ['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],
+   ['いったん離れる',()=>show('map')]
+  ]);return;
+ }
+ if(p==='indoor'){
+  story(p,'マボ',intro,[
+   ['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],
+   ['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],
+   ['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],
+   ['マップへ戻る',()=>show('map')]
+  ]);return;
+ }
+ if(p==='rest'){
+  story(p,'マボ',intro,[
+   ['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],
+   ['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],
+   ['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],
+   ['マップへ戻る',()=>show('map')]
+  ]);return;
+ }
+ if(p==='east'){
+  story(p,'マボ',intro,[
+   ['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],
+   ['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],
+   ['「ポーズも場所も全部お任せで」と丸投げする',()=>layerTrap('east')],
+   ['マップへ戻る',()=>show('map')]
+  ]);return;
+ }
+ story(p,'マボ',intro,[
+  ['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],
+  ['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],
+  ['「友達が来てもあと5分だけ」と先に頼む',()=>layerTrap('entrance')],
+  ['マップへ戻る',()=>show('map')]
+ ]);
+}
 function visitLoop2(p){
  if(p==='rivals'){cameraEncounterLoop2();return}
+ const metInFirstLoop=!!(S.priorMet&&S.priorMet.has(p));
  S.met.add(p);
  if(S.shotDone.has(p)){postShootVisit(p);return}
  if(S.refused.has(p)){story(p,people[p].name,'「今日はもう撮影しません」<br><span class="thought">（二周目でも、一度出た答えは変わらない。）</span>',[['謝って離れる',()=>{S.backedOff++;show('map')}],['マップへ戻る',()=>show('map')]]);return}
  if(S.priorRefused.has(p)){loop2WaryVisit(p);return}
+ if(!metInFirstLoop){loop2FirstMeet(p);return}
  story(p,'マボ',LOOP2_INTRO[p]+'<br><span class="thought">（次のちゅどーむ。前回と同じ人でも、今日の空気は今日のものだ。）</span>',[
   ['声を掛ける',()=>loop2NormalChoices(p)],
   ['少し様子を見る',()=>{S.trust++;story(p,'マボ','少し離れて様子を見る。相手が落ち着いたところで目が合った。<br><span class="thought">（待つ時間も撮影の一部……って言うと格好つけすぎか。）</span>',[['声を掛ける',()=>loop2NormalChoices(p)],['まだ離れておく',()=>show('map')]])}],
@@ -835,18 +881,19 @@ function cameraLoop2Result(){
 }
 function startSecondLoop(){
  const prior={
-  refused:new Set(S.refused),shot:new Set(S.shotDone),bond:{...S.bond},camRep:S.camRep,
+  refused:new Set(S.refused),shot:new Set(S.shotDone),met:new Set(S.met),bond:{...S.bond},camRep:S.camRep,
   rep:S.rep,trust:S.trust,unease:S.unease
  };
  const n=freshGameState();
- n.loop=2;n.secondLoop=true;n.priorRefused=prior.refused;n.priorShot=prior.shot;n.priorBond=prior.bond;n.priorCamRep=prior.camRep;
+ n.loop=2;n.secondLoop=true;n.priorRefused=prior.refused;n.priorShot=prior.shot;n.priorMet=prior.met;n.priorBond=prior.bond;n.priorCamRep=prior.camRep;
  n.rep=Math.max(-2,Math.round(prior.rep*.6));n.trust=Math.max(0,Math.round(prior.trust*.5));n.unease=Math.max(0,Math.round(prior.unease*.25));n.camRep=Math.round(prior.camRep*.5);
  n.bond={...prior.bond};
  S=n;updateShotStatus();
  theme('field');
- story('outdoor','数週間後','<b>次のちゅどーむイベント。</b><br><br>同じ会場。同じカメラ。同じバッグ。<br>でも、一度会った人たちとの距離だけは前回と同じではない。<br><span class="thought">（二回目だ。覚えられてるかもしれない。良い意味でも、悪い意味でも。）</span>',[
+ story('outdoor','数週間後','<b>次のちゅどーむイベント。</b><br><br>同じ会場。同じカメラ。同じバッグ。<br>前回会った人も、まだ一度も話していない人もいる。<br><span class="thought">（二回目のイベント。でも相手によっては今日が初対面だ。そこは勘違いするな、俺。）</span>',[
   ['会場マップへ向かう',()=>{theme('field');show('map');window.scrollTo(0,0)}]
  ],IMG.venue);
+ const loop2IntroImg=$('#sceneImg');if(loop2IntroImg)loop2IntroImg.classList.add('loop2IntroCrop');
 }
 function visit(p){
  if(S.loop===2){visitLoop2(p);return}
