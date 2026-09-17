@@ -337,6 +337,14 @@
   background-position:center center!important;
 }
 
+
+/* Ver.6.6 graphic-safe rendering */
+.art,.shootView,.thumb,.venueStage,.mapNpc,.mapNpc .mapFace,.endGallery img,.storyGallery img{overflow:hidden!important}
+.art>img,#sceneImg,#camImg,.thumb img,.endGallery img,.storyGallery img,.mapNpc .mapFace{display:block;max-width:none!important;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+#shoot .shootView{contain:layout paint style!important;isolation:isolate!important}
+#shoot .shootView #camImg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
+#story .art,#intro .art,#shoot .shootView,.venueStage,.endGallery,.storyGallery{position:relative!important}
+
 </style><style>
 .v2status{margin-top:7px;padding:7px 9px;border:1px solid #66727d;border-radius:7px;background:#111a22;color:#edf4f8;font-size:12px}
 .v2status b{color:#ffe082}.v2event{margin:8px 0;padding:8px;border-left:4px solid #d6c36a;background:#1a222b;font-size:13px}
@@ -351,7 +359,7 @@
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
 </div>
 
-<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.5</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen active"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.7</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -374,7 +382,7 @@
         <div class="mapZone" data-label="屋内撮影エリア" style="left:34%;top:69%;width:32%;height:20%"></div>
         <div class="mapCenter"></div>
 
-        <button class="mapNpc" data-place="entrance" style="left:19%;top:24%">
+        <button class="mapNpc" data-place="entrance" style="left:50%;top:80%">
           <img class="mapFace" data-area-face="entrance" alt="あや">
           <span class="mapName">あや</span>
           <span class="statusBadge"></span>
@@ -402,7 +410,7 @@
           <span class="mapSpot">東側</span>
         </button>
 
-        <button class="mapNpc" data-place="indoor" style="left:50%;top:80%">
+        <button class="mapNpc" data-place="indoor" style="left:19%;top:24%">
           <img class="mapFace" data-area-face="indoor" alt="りお">
           <span class="mapName">りお</span>
           <span class="statusBadge"></span>
@@ -454,7 +462,7 @@ function v4Closing(){
 }
 function v2Clock(){let h=Math.floor(Math.min(S.timeMin,900)/60),m=Math.min(S.timeMin,900)%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
 function v2Advance(n){v2Status()}
-function v2Status(){let e=$('#v2status');if(!e)return;let r=S.rep+S.trust-S.unease-S.rude;let rt=r>=13?'人気カメコ':r>=10?'信頼されている':r>=7?'評判が良い':r>=4?'好印象':r>=2?'少し知られている':r>=1?'顔を覚えられ始めた':'無名';let cr=S.camRep>=2?'良好':S.camRep<=-3?'悪評':'普通';let lc=r>=7?'good':r<1?'mid':'mid';let cc=S.camRep>=2?'good':S.camRep<=-3?'bad':'mid';e.innerHTML='<div class="statusCell timeCell"><span class="statusLabel">現在時刻</span><span class="statusValue timeValue">'+v2Clock()+'</span></div><div class="statusCell"><span class="statusLabel">レイヤー評判</span><span class="statusValue '+lc+'">'+rt+'</span></div><div class="statusCell"><span class="statusLabel">カメコ評判</span><span class="statusValue '+cc+'">'+cr+(S.secondLoop?' ★':'')+'</span></div>'}
+function v2Status(){let e=$('#v2status');if(!e)return;let r=layerRepScore();let rt=layerRepName();let cr=S.camRep>=2?'良好':S.camRep<=-3?'悪評':'普通';let lc=(rt==='神カメコ'||r>=9)?'good':'mid';let cc=S.camRep>=2?'good':S.camRep<=-3?'bad':'mid';e.innerHTML='<div class="statusCell timeCell"><span class="statusLabel">現在時刻</span><span class="statusValue timeValue">'+v2Clock()+'</span></div><div class="statusCell"><span class="statusLabel">レイヤー評判</span><span class="statusValue '+lc+'">'+rt+'</span></div><div class="statusCell"><span class="statusLabel">カメコ評判</span><span class="statusValue '+cc+'">'+cr+(S.secondLoop?' ★':'')+'</span></div>';}
 function v2Propagation(p){let a=[...S.shotDone].filter(x=>x!==p);if(a.length&&S.rep>=2){let n=people[a[0]]?.name||'別のレイヤー';return '<div class="v2event">💬 「さっき'+n+'さんを撮ってましたよね」<br>会場内で少しずつ名前が伝わっている。</div>'}if(S.unease>=3||S.rude>=2)return '<div class="v2event">💬 一瞬だけ警戒するような視線を感じる。会場では行動も人づてに伝わる。</div>';return ''}
 function v2Result(){let a=Object.values(S.photoScores),avg=a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;let tech=Math.max(0,Math.min(100,avg)),comm=Math.max(0,Math.min(100,50+(S.trust+S.rep)*8-S.unease*6)),dist=Math.max(0,Math.min(100,80+S.backedOff*6-S.creep*12-S.rude*8-S.warningIncidents.length*40)),cam=Math.max(0,Math.min(100,55+S.camRep*8-S.rivalFlags*4)),total=Math.round((tech+comm+dist+cam)/4),grade=total>=90?'S':total>=80?'A':total>=70?'B':total>=60?'C':total>=45?'D':'E';if(!v4AllShot()&&(grade==='S'||grade==='A'))grade='B';return {avg,tech,comm,dist,cam,total,grade}}
 function v2ResultHTML(){let r=v2Result();return '<div class="resultCard"><h3>本日のカメコ評価</h3><div class="rankBig">'+r.grade+'</div><div>撮影技術：'+r.tech+'　コミュ力：'+r.comm+'<br>距離感：'+r.dist+'　カメコ評判：'+r.cam+'<br>撮影人数：'+S.shotDone.size+'/5　写真平均：'+r.avg+'点<br>終了時刻：'+v2Clock()+'　総合：'+r.total+'</div><p><b>野良カメコ Lv.'+Math.max(1,Math.floor(r.total/10))+'</b></p></div>'}
@@ -658,7 +666,7 @@ function story(p,sp,text,choices,img){
  let c=$('#cmds');c.innerHTML='';choices.forEach(([t,fn])=>{let b=document.createElement('button');b.className='cmd';b.textContent=t;b.onclick=()=>{click();fn()};c.appendChild(b)});
  show('story');
 }
-function markShot(p){if(!['outdoor','indoor','rest','east','entrance'].includes(p))return;S.shotDone.add(p);S.refused.delete(p);updateShotStatus()}function updateShotStatus(){document.querySelectorAll('.mapbtn[data-place]').forEach(b=>{let p=b.dataset.place;if(!['outdoor','indoor','rest','east','entrance'].includes(p))return;let oldShot=b.querySelector('.shotBadge'),oldRef=b.querySelector('.refuseBadge');if(oldShot)oldShot.remove();if(oldRef)oldRef.remove();let tag=null;if(S.shotDone.has(p)){tag=document.createElement('em');tag.className='shotBadge';tag.textContent='✓ 撮影済'}else if(S.refused.has(p)){tag=document.createElement('em');tag.className='refuseBadge';tag.textContent='× 撮影NG'}if(tag)b.querySelector('b').appendChild(tag)});let el=$('#shotProgress');let done=S.shotDone.size,ng=[...S.refused].filter(p=>['outdoor','indoor','rest','east','entrance'].includes(p)&&!S.shotDone.has(p)).length,resolved=done+ng;if(el)el.textContent=`撮影済 ${done} / 5人　撮影NG ${ng}人${resolved===5?'　― 全員の結果が確定 ―':''}`;let finish=$('#finishDay');if(finish)finish.classList.toggle('show',resolved>=1||S.timeMin>=900);v2Status()}
+function markShot(p){if(!['outdoor','indoor','rest','east','entrance'].includes(p))return;S.shotDone.add(p);S.refused.delete(p);updateShotStatus()}function updateShotStatus(){document.querySelectorAll('.mapNpc[data-place]').forEach(b=>{let p=b.dataset.place;if(!['outdoor','indoor','rest','east','entrance'].includes(p))return;b.classList.remove('done','ng');let badge=b.querySelector('.statusBadge');if(!badge)return;badge.textContent='';if(S.shotDone.has(p)){b.classList.add('done');badge.textContent='✓ 撮影済'}else if(S.refused.has(p)){b.classList.add('ng');badge.textContent='× 撮影NG'}});let el=$('#shotProgress');let done=S.shotDone.size,ng=[...S.refused].filter(p=>['outdoor','indoor','rest','east','entrance'].includes(p)&&!S.shotDone.has(p)).length,resolved=done+ng;if(el)el.textContent=`撮影済 ${done} / 5人　撮影NG ${ng}人${resolved===5?'　― 全員の結果が確定 ―':''}`;let finish=$('#finishDay');if(finish)finish.classList.toggle('show',resolved>=1||S.timeMin>=900);v2Status()}
 $$('.mapbtn').forEach(b=>b.onclick=()=>{click();visit(b.dataset.place)});$('#rivalBack').onclick=()=>show('map');$('#finishDay').onclick=()=>{click();finishDayEnding()};
 function postShootVisit(p){let P=people[p],score=S.photoScores[p]||S.photo||0;story(p,P.name,`「あ、マボさん。さっきはありがとうございました！」<br>撮影はもう終わっている。もう一度カメラを向ける場面ではない。<br><span class="thought">（ここからは撮影後の振る舞いで印象が決まる。）</span>`,[['「こちらこそ、ありがとうございました」とお礼する',()=>{S.rep++;S.trust++;story(p,P.name,'「はい！ また機会があったらお願いします」<br><span class="thought">自然に会話を終えられた。</span>',[['マップへ戻る',()=>show('map')]])}],['「あとで写真送りますね」と伝える',()=>{S.rep++;S.trust++;story(p,P.name,score?`「ありがとうございます！ ${score>=80?'楽しみにしてます！':'確認しますね！'}」`:'「ありがとうございます！ 楽しみにしてます」',[['マップへ戻る',()=>show('map')]])}],['「もう一度撮らせてください」と頼む',()=>{S.unease++;story(p,P.name,'「あ、今日はもう大丈夫です……」<br>さっきより少しだけ距離を取られた。<br><span class="thought">（撮影済みなのに重ねて頼むのは、さすがに違った。）</span>',[['すぐ引く',()=>{S.backedOff++;show('map')}],['さらに食い下がる',()=>{recordWarningIncident(p,'撮影済みで断られた後もさらに迫る');endingBad('warning')} ]])}],['マップへ戻る',()=>show('map')]])}
 const LOOP2_INTRO={
@@ -678,7 +686,22 @@ const LOOP2_WARY={
 
 const LOOP2_REP_LABELS=['無名','顔を覚えられ始めた','少し知られている','好印象','評判が良い','信頼されている','人気カメコ'];
 function layerRepScore(){return S.rep+S.trust-S.unease-S.rude}
-function layerRepTier(score=layerRepScore()){return score>=13?6:score>=10?5:score>=7?4:score>=4?3:score>=2?2:score>=1?1:0}
+function layerRepTier(score=layerRepScore()){return score>=16?6:score>=12?5:score>=9?4:score>=6?3:score>=3?2:score>=1?1:0}
+function secondLoopStats(){
+ const places=['outdoor','indoor','rest','east','entrance'];
+ const scores=Object.values(S.photoScores).filter(v=>typeof v==='number');
+ return {done:S.shotDone.size,ng:[...S.refused].filter(x=>places.includes(x)&&!S.shotDone.has(x)).length,avg:scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0,max:scores.length?Math.max(...scores):0,repScore:layerRepScore()};
+}
+function isGodKameko(){
+ if(S.loop!==2)return false;
+ const q=secondLoopStats();
+ return q.done===5&&q.ng===0&&q.avg>=92&&q.max>=97&&q.repScore>=16&&S.warningIncidents.length===0&&S.pressureLog.length===0&&S.creep===0&&S.rude===0&&S.unease<=2&&S.camRep>=0;
+}
+function layerRepName(){
+ if(isGodKameko())return '神カメコ';
+ const labels=['無名','顔を覚えられ始めた','少し知られている','好印象','評判が良い','信頼されている','人気カメコ'];
+ return labels[layerRepTier()];
+}
 function loop2RepGreeting(p){
  const tier=layerRepTier(),first=S.priorShot.has(p);
  const seenText=first?'この前の写真のことも含めて、前回の記憶が残っている。':'前回のイベントで顔を合わせたことだけは、相手の記憶に残っていそうだ。';
@@ -928,10 +951,10 @@ function applyPoseLook(){let c=S.cam||{pose:0,x:0,z:1};let img=$('#camImg');img.
 function startShoot(place='outdoor'){S.currentShoot=place;theme('shoot');show('shoot');S.shots=[];S.cam={x:0,z:1,pose:0};setImageNoFlash($('#camImg'),poseImage(place,0));let old=$('.shootName');if(old)old.remove();let nm=document.createElement('div');nm.className='shootName';nm.textContent='撮影：'+people[place].name;$('.shootView').appendChild(nm);let oldh=$('#shotHint');if(oldh)oldh.remove();let hint=document.createElement('div');hint.id='shotHint';hint.className='shotHint';$('.shootView').appendChild(hint);renderCam();v2Advance(20)}
 function renderCam(){let c=S.cam;applyPoseLook();let n=6-S.shots.length;$('#remain').textContent=`あと ${n} / 6 枚`;$('#countBig').textContent=`あと ${n} / 6 枚`;let h=$('#shotHint');if(h)h.innerHTML='構図ヒント：'+poseHint(S.currentShoot,c.pose)+'<br><b>'+v4CompositionFeedback(S.currentShoot,c.pose)+'</b>'}
 $$('[data-cam]').forEach(b=>b.onclick=()=>{click();let c=S.cam,a=b.dataset.cam;if(a==='left')c.x=Math.max(-70,c.x-18);if(a==='right')c.x=Math.min(70,c.x+18);if(a==='in')c.z=Math.min(1.30,c.z+.08);if(a==='out')c.z=Math.max(.82,c.z-.08);if(a==='center'){c.x=0;c.z=1}if(a==='pose'){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose))}renderCam()});
-$('#shutter').onclick=()=>{if(S.shots.length>=6)return;shotFx();let f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');let c=S.cam,ideal=(SHOTIDEAL[S.currentShoot]||SHOTIDEAL.outdoor)[c.pose%6],dx=Math.abs(c.x-ideal[0]),dz=Math.abs(c.z-ideal[1]);let composition=Math.round(Math.max(0,100-dx*1.15));let distance=Math.round(Math.max(0,100-dz*210));let score=Math.round(composition*.62+distance*.38);score=Math.max(35,Math.min(99,score));S.shots.push({score,composition,distance,pose:c.pose,img:poseImage(S.currentShoot,c.pose)});if(score>=88){S.rep++;S.trust++;if(S.bond&&S.bond[S.currentShoot]!==undefined)S.bond[S.currentShoot]++}else if(score<55){S.rep=Math.max(-5,S.rep-1)}if(S.shots.length<6){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose));c.x=0;c.z=1}renderCam();if(S.shots.length===6)setTimeout(photoSelect,350)};
+$('#shutter').onclick=()=>{if(S.shots.length>=6)return;shotFx();let f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');let c=S.cam,ideal=(SHOTIDEAL[S.currentShoot]||SHOTIDEAL.outdoor)[c.pose%6],dx=Math.abs(c.x-ideal[0]),dz=Math.abs(c.z-ideal[1]);let composition=Math.round(Math.max(0,100-dx*1.15));let distance=Math.round(Math.max(0,100-dz*210));let score=Math.round(composition*.62+distance*.38);score=Math.max(35,Math.min(99,score));S.shots.push({score,composition,distance,pose:c.pose,img:poseImage(S.currentShoot,c.pose)});if(score>=90){if(S.bond&&S.bond[S.currentShoot]!==undefined)S.bond[S.currentShoot]++}else if(score<50){S.unease=Math.min(S.unease+0,99)}if(S.shots.length<6){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose));c.x=0;c.z=1}renderCam();if(S.shots.length===6)setTimeout(photoSelect,350)};
 function v4ReturnMap(){if(S.timeMin>=900)return v4Closing();show('map')}
 function photoSelect(){let p=S.currentShoot||'outdoor',P=people[p];markShot(p);v4SetProgressTime();show('select');$('#selectTitle').textContent=P.name+'の写真を選ぶ';$('#selectSub').textContent='6枚から1枚';$('#selectDialog').innerHTML=p==='outdoor'?'雪奈へ送る一枚を選ぶ。<br><span class="thought">（六枚全部送りつけるのは……違う。たぶん違う。）</span>':P.name+'を撮った六枚から、いちばん良い一枚を選ぶ。<br><span class="thought">（撮るだけじゃない。選ぶところまでが撮影だ。）</span>';$('#sendPhoto').textContent=p==='outdoor'?'この写真を送る':'この写真に決める';let g=$('#selectGrid');g.innerHTML='';S.selected=null;S.shots.forEach((s,i)=>{let b=document.createElement('button');b.className='thumb';b.innerHTML=`<img src="${s.img}"><span>${i+1}　${s.score}点<br>構図${s.composition} / 距離${s.distance}</span>`;b.onclick=()=>{$$('.thumb').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');S.selected=i;click()};g.appendChild(b)})}
-$('#sendPhoto').onclick=()=>{if(S.selected===null){alert('写真を1枚選んでください');return}let p=S.currentShoot||'outdoor',score=S.shots[S.selected].score,P=people[p];S.photoScores[p]=score;if(p==='outdoor')S.photo=score;if(S.bond&&S.bond[p]!==undefined)S.bond[p]+=score>=85?3:score>=75?2:1;S.rep+=score>=85?2:score>=70?1:0;S.trust+=score>=90?1:0;
+$('#sendPhoto').onclick=()=>{if(S.selected===null){alert('写真を1枚選んでください');return}let p=S.currentShoot||'outdoor',score=S.shots[S.selected].score,P=people[p];S.photoScores[p]=score;if(p==='outdoor')S.photo=score;if(S.bond&&S.bond[p]!==undefined)S.bond[p]+=score>=90?2:score>=78?1:0;S.rep+=score>=92?1:0;S.trust+=score>=85?1:0;
 let reaction='';
 if(score>=90){
   reaction=p==='outdoor'?'「えっ、これすごく好きです！ 表情も雰囲気もめっちゃいい……！」':
@@ -1019,7 +1042,50 @@ function individualEnding(p){
   <div class="endImpact">${data.impact}</div>
   <div class="endText"><b>${P.name}との一枚が、次の撮影につながった。</b><br><span class="thought">選択写真：${score}点</span></div>`;
 }
+function secondLoopBadEnding(kind){
+ theme('bad');show('end');$('#ending').className='endScene bad';
+ const q=secondLoopStats();
+ if(kind==='abyss'){
+  $('#endTitle').textContent='SUPER BAD END　もう誰も近づかない';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${V8IMG.bad}"><img src="${COMMON_WARNING_SNS}"><img src="${IMG.venue}"></div><div class="endChapter">二度目のちゅどーむ ― 開場直後</div><div class="endText">前回のことを覚えている人がいた。しかも、良い意味ではなかった。マボが近づく前にレイヤー同士の会話が止まり、視線が動いた。</div><div class="endChapter">同じ失敗を、もう一度</div><div class="endText">一度断られた相手に、また撮影を頼んだ。警戒されているのに距離を詰めた。前回なら「知らなかった」で済ませようとした言動を、今回は知った上で繰り返した。</div><div class="endImpact">一度目は失敗だった。二度目は、選択だった。</div><div class="endText">スタッフがこちらを確認する。レイヤーは友人の後ろへ下がる。カメラマンたちも輪を閉じる。<br><br><b>会場にいるのに、誰にも声を掛けられない。シャッターは一度も鳴らなかった。</b></div><div class="post"><b>本日の結果</b><br>撮影済 ${q.done}人 / 撮影NG ${q.ng}人<br>レイヤー評判：悪評固定<br>カメコ評判：${S.camRep<=-3?'悪評':'孤立'}</div>`;
+ }else{
+  $('#endTitle').textContent='BAD END　二度目の距離';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${IMG.venue}"><img src="${IMG.karen}"><img src="${IMG.yukina}"></div><div class="endChapter">二度目だからこそ</div><div class="endText">前回より顔は覚えられていた。だからこそ、小さな違和感も前より早く伝わった。会話は続く。怒られもしない。ただ、次第に撮影を断られることが増えていく。</div><div class="endImpact">一度目の違和感は偶然に見える。二度目の違和感は、その人の印象になる。</div><div class="endText"><b>マボは名前を覚えられた。望んでいた形とは少し違って。</b></div>`;
+ }
+}
+function secondLoopEnding(){
+ const q=secondLoopStats();
+ const priorBad=S.priorRefused?.size||0;
+ const severe=S.warningIncidents.length>0||S.pressureLog.length>=2||S.creep>=3||S.rude>=3||(priorBad>0&&S.pressureLog.length>0);
+ if(S.camRep<=-5||severe)return secondLoopBadEnding('abyss');
+ if(S.pressureLog.length>0||S.creep+S.rude>=3||S.unease+S.rivalFlags>=8)return secondLoopBadEnding('distance');
+ theme('good');show('end');$('#ending').className='endScene good';
+ if(isGodKameko()){
+  $('#endTitle').textContent='TRUE END　神カメコ';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${ENDIMG.end_good_venue}"><img src="${IMG.yukina}"><img src="${IMG.karen}"></div><div class="endChapter">二度目のちゅどーむ ― 閉場後</div><div class="endText">五人全員の撮影が終わった。誰かに急かされることも、誰かを急かすこともなかった。撮った写真はどれも強く、最高の一枚は${q.max}点。平均は${q.avg}点。</div><div class="endChapter">翌朝 ― 通知が止まらない</div><div class="post"><b>雪奈</b><br>次もお願いしたいです！<br><br><b>カレン</b><br>次は作品撮りで相談できますか？<br><br><b>みく</b><br>友達にもマボさん紹介していいですか？</div><div class="endText">DMは一件ではなかった。イベントで知り合ったレイヤーから、さらに別のレイヤーへ名前が伝わっていく。今度は噂が先ではない。写真が先に届き、その後から名前がついていった。</div><div class="endImpact">「撮ってください」と頼む側だった男が、ついに「撮ってほしい」と頼まれる側になった。</div><div class="endText"><b>レイヤー評判：神カメコ<br>マボの名前は、ちゅどーむから消えなかった。写真と一緒に残った。</b></div>`;
+  return;
+ }
+ const rank=layerRepName();
+ if(rank==='人気カメコ'||rank==='信頼されている'){
+  $('#endTitle').textContent='SPECIAL END　次は向こうから';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${ENDIMG.end_good_venue}"><img src="${IMG.aya}"><img src="${IMG.rio}"></div><div class="endChapter">イベントの翌週</div><div class="endText">前回は「また会えたら」だった。二度目を終えた今、メッセージの内容が変わった。<br><br>「次のイベント、来ますか？」<br>「この衣装、マボさんに撮ってほしいです」</div><div class="endImpact">偶然の再会ではなく、次の予定として名前が挙がるようになった。</div><div class="endText"><b>レイヤー評判：${rank}</b><br>写真だけでなく、撮影する人として信頼が残った。</div>`;
+  return;
+ }
+ if(rank==='評判が良い'||rank==='好印象'){
+  $('#endTitle').textContent='GOOD END　名前で呼ばれる';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${IMG.venue}"><img src="${IMG.miku}"><img src="${IMG.karen}"></div><div class="endChapter">二度目の帰り道</div><div class="endText">今日は何度か「マボさん」と名前で呼ばれた。前回のような偶然の一枚ではない。会話も撮影も、少しずつ自然になっていた。</div><div class="endImpact">界隈に居場所ができるのは、派手な一枚より小さな積み重ねなのかもしれない。</div><div class="endText"><b>レイヤー評判：${rank}</b><br>次のちゅどーむでも、何人かはマボの顔を覚えている。</div>`;
+  return;
+ }
+ if(rank==='少し知られている'||rank==='顔を覚えられ始めた'){
+  $('#endTitle').textContent='END　二回目の顔';
+  $('#endBody').innerHTML=`<div class="endGallery storyGallery"><img class="wide" src="${IMG.venue}"><img src="${IMG.aya}"><img src="${IMG.yukina}"></div><div class="endChapter">閉場</div><div class="endText">「前にもいましたよね？」と言われる回数が増えた。まだ名前までは出てこない。でも、完全な知らない人ではなくなった。</div><div class="endImpact">一周目は無名。二周目は、顔が残った。</div><div class="endText"><b>レイヤー評判：${rank}</b></div>`;
+  return;
+ }
+ $('#endTitle').textContent='END　二度来ても、まだ無名';
+ $('#endBody').innerHTML=`<div class="endGallery"><img class="wide" src="${IMG.venue}"></div><div class="endChapter">二度目の閉場</div><div class="endText">二回イベントへ来た。写真も撮った。それでも、会場を出れば大半の人の記憶から消えていく。</div><div class="endImpact">悪くはない。だが、まだ何者でもない。</div><div class="endText"><b>レイヤー評判：無名</b><br>マボは三度目のイベント予定を眺めた。</div>`;
+}
 function finishDayEnding(){
+  if(S.loop===2)return secondLoopEnding();
   let places=['outdoor','indoor','rest','east','entrance'];
   let done=S.shotDone.size;
   let ng=[...S.refused].filter(p=>places.includes(p)&&!S.shotDone.has(p)).length;
@@ -1118,11 +1184,11 @@ window.addEventListener('pageshow',()=>{
 
 /* Ver.5.2: force new pose portraits on venue-map icons */
 const V52_MAP_FACE={
- outdoor:'poses/outdoor5.jpg',
- indoor:'poses/embedded_058c90fae66e28a4.jpg',
- rest:'poses/rest5.jpg',
- east:'poses/east5.jpg',
- entrance:'poses/entrance5.jpg'
+ outdoor:IMG.yukina,
+ indoor:IMG.rio,
+ rest:IMG.miku,
+ east:IMG.karen,
+ entrance:IMG.aya
 };
 function v52ForceMapFaces(){
  document.querySelectorAll('.mapNpc[data-place]').forEach(n=>{
