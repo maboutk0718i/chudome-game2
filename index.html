@@ -424,7 +424,7 @@
 </div>
 
 <section id="pretitle" class="screen active"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.17</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.18</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -1330,12 +1330,34 @@ function resetTitleScreen(){
   });
 }
 
+
+function returnDirectToTitle(){
+  clearInterval(timer);timer=null;currentTheme=null;first=true;audioNeedsResume=false;
+  S=freshGameState();updateShotStatus();preludeRunning=false;
+  const pt=$('#preludeText');if(pt){pt.className='';pt.innerHTML=''}
+  const ps=$('#preludeStart');if(ps){ps.disabled=false;ps.style.opacity='1';ps.style.pointerEvents='auto'}
+  const press=$('#press');if(press){press.textContent='ゲームをはじめる';press.style.removeProperty('display');press.style.removeProperty('visibility');press.style.removeProperty('opacity');press.style.removeProperty('pointer-events');press.disabled=false}
+  const title=$('#title');if(title)title.classList.add('pretitleArrival');
+  show('title');
+  try{
+    let a=ensureFullBgm();
+    fullBgmWanted='title';
+    if(fullBgmKind!=='title'){a.pause();a.src=FULL_BGM.title;fullBgmKind='title'}
+    a.muted=true;a.volume=.96*masterVolume;
+    try{a.currentTime=0}catch(e){}
+    const start=()=>{a.muted=soundMuted;let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true})};
+    if(a.readyState>=1)start();else a.addEventListener('loadedmetadata',start,{once:true});
+  }catch(e){audioNeedsResume=true}
+  requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0});
+  setTimeout(()=>{if(title)title.classList.remove('pretitleArrival')},1000);
+}
+
 $('#restart').onclick=()=>{
   click();
   if(S.loop===1){startSecondLoop();return}
   showEndPoster();
 };
-$('#posterReturn').onclick=()=>{click();let ps=$('#posterScene');if(ps){ps.classList.remove('posterVisible');ps.classList.add('posterLeaving')}setTimeout(()=>{if(ps)ps.classList.remove('posterLeaving');resetTitleScreen()},1280)};
+$('#posterReturn').onclick=()=>{click();let ps=$('#posterScene');if(ps){ps.classList.remove('posterVisible');ps.classList.add('posterLeaving')}setTimeout(()=>{if(ps)ps.classList.remove('posterLeaving');returnDirectToTitle()},1280)};
 
 // iOS/X in-app browser may restore a page from back-forward cache.
 // If the title is the active screen, always restore the start button explicitly.
