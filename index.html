@@ -436,7 +436,7 @@
 
 <section id="loading" class="screen active"><div class="loadingInner"><div class="loadingText">NOW LOADING...</div><div class="loadingSub">CHUDOME GAME DATA</div></div></section>
 <section id="pretitle" class="screen"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.30</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.31</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -828,6 +828,7 @@ function secondLoopStats(){
  const scores=Object.values(S.photoScores).filter(v=>typeof v==='number');
  return {done:S.shotDone.size,ng:[...S.refused].filter(x=>places.includes(x)&&!S.shotDone.has(x)).length,avg:scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0,max:scores.length?Math.max(...scores):0,repScore:layerRepScore()};
 }
+function layerBadProtected(){let rank=layerRepName();return rank==='信頼されている'||rank==='人気カメコ'}
 function isGodKameko(){
  if(S.loop!==2)return false;
  const q=secondLoopStats();
@@ -1248,7 +1249,7 @@ function startShoot(place='outdoor'){S.currentShoot=place;theme('shoot');show('s
 function renderCam(){let c=S.cam;applyPoseLook();let n=6-S.shots.length;$('#remain').textContent=`あと ${n} / 6 枚`;$('#countBig').textContent=`あと ${n} / 6 枚`;let h=$('#shotHint');if(h)h.innerHTML='構図ヒント：'+poseHint(S.currentShoot,c.pose)+'<br><b>'+v4CompositionFeedback(S.currentShoot,c.pose)+'</b>'}
 $$('[data-cam]').forEach(b=>b.onclick=()=>{click();let c=S.cam,a=b.dataset.cam;if(a==='left')c.x=Math.max(-70,c.x-18);if(a==='right')c.x=Math.min(70,c.x+18);if(a==='in')c.z=Math.min(1.30,c.z+.08);if(a==='out')c.z=Math.max(.82,c.z-.08);if(a==='center'){c.x=0;c.z=1}if(a==='pose'){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose))}renderCam()});
 $('#shutter').onclick=()=>{if(S.shots.length>=6)return;shotFx();let f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');let c=S.cam,ideal=(SHOTIDEAL[S.currentShoot]||SHOTIDEAL.outdoor)[c.pose%6],dx=Math.abs(c.x-ideal[0]),dz=Math.abs(c.z-ideal[1]);let composition=Math.round(Math.max(0,100-dx*1.15));let distance=Math.round(Math.max(0,100-dz*210));let score=Math.round(composition*.62+distance*.38);score=Math.max(35,Math.min(99,score));S.shots.push({score,composition,distance,pose:c.pose,img:poseImage(S.currentShoot,c.pose)});if(score>=90){if(S.bond&&S.bond[S.currentShoot]!==undefined)S.bond[S.currentShoot]++}else if(score<50){S.unease=Math.min(S.unease+0,99)}if(S.shots.length<6){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose));c.x=0;c.z=1}renderCam();if(S.shots.length===6)setTimeout(photoSelect,350)};
-function v4ReturnMap(){if(S.timeMin>=900)return v4Closing();show('map')}
+function v4ReturnMap(){v4SetProgressTime();if(S.shotDone.size>=5&&S.v4RivalsComplete){S.timeMin=900;v2Status();return v4Closing()}if(S.timeMin>=900)return v4Closing();show('map')}
 const PHOTO_TASTE={outdoor:{best:[1,4],good:[0,5],labels:['表情','自然さ','雰囲気']},indoor:{best:[0,5],good:[3,4],labels:['質感','世界観','陰影']},rest:{best:[0,2],good:[1,4],labels:['自然さ','表情','空気感']},east:{best:[2,4],good:[1,5],labels:['構図','背景','作品感']},entrance:{best:[1,3],good:[0,5],labels:['表情','明るさ','SNS映え']}};
 function photoTasteBonus(p,s){let t=PHOTO_TASTE[p]||PHOTO_TASTE.outdoor;return t.best.includes(s.pose)?12:t.good.includes(s.pose)?5:-6}
 function photoAppeal(p,s){return Math.max(35,Math.min(99,s.score+photoTasteBonus(p,s)))}
@@ -1329,9 +1330,12 @@ function secondLoopEnding(){
  const score=v2Result();
  const priorBad=S.priorRefused?.size||0;
  const severe=S.warningIncidents.length>0||S.pressureLog.length>=2||S.creep>=3||S.rude>=3||(priorBad>0&&S.pressureLog.length>0);
+ const protectedRep=layerBadProtected();
  if((S.camRep<=-5&&S.camHostile))return secondLoopBadEnding('camera');
- if(S.camRep<=-5||severe)return secondLoopBadEnding('abyss');
- if(S.pressureLog.length>0||S.creep+S.rude>=3||S.unease+S.rivalFlags>=8)return secondLoopBadEnding('distance');
+ if(S.warningIncidents.length>0)return secondLoopBadEnding('abyss');
+ if(!protectedRep&&S.camRep<=-5)return secondLoopBadEnding('abyss');
+ if(!protectedRep&&severe)return secondLoopBadEnding('abyss');
+ if(!protectedRep&&(S.pressureLog.length>0||S.creep+S.rude>=3||S.unease+S.rivalFlags>=8))return secondLoopBadEnding('distance');
  theme('good');show('end');$('#ending').className='endScene good';
  if(isGodKameko()||(score.grade==='S'&&score.total>=90&&S.priorShot.size===5&&q.done>=5&&q.avg>=90)){
   setEndPosterMode('god');
@@ -1361,10 +1365,12 @@ function finishDayEnding(){setEndPosterMode('good');
   // BAD系は「誰を撮ったか」とは別に、その日の行動で判定
   let layerRisk=S.creep+S.rude;
   let socialRisk=S.unease+S.rivalFlags+(S.camRep<=-3?2:0);
-  if(S.camRep<=-5)return endingBad('camera');
+  let protectedRep=layerBadProtected();
+  if(S.camRep<=-5&&S.camHostile)return endingBad('camera');
   if(S.warningIncidents.length>0)return endingBad('warning');
-  if(S.pressureLog.length>0||layerRisk>=4)return endingBad('distance');
-  if(socialRisk>=7)return endingBad('isolation');
+  if(!protectedRep&&S.camRep<=-5)return endingBad('camera');
+  if(!protectedRep&&(S.pressureLog.length>0||layerRisk>=4))return endingBad('distance');
+  if(!protectedRep&&socialRisk>=7)return endingBad('isolation');
 
   // 4人以上＋写真平均80点以上＋評判良好なら、個人ENDを越える総合HAPPY
   if(done>=4&&avg>=80&&S.rep>=3&&S.trust>=4)return endingGood(true);
