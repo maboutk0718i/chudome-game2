@@ -1605,4 +1605,114 @@ window.addEventListener('load',()=>{
     finishBootLoading();
   }catch(e){console.error(e);show('pretitle')}
 });
+
+</script>
+<script>
+/* === Ver6.35 patch: 2周目 雪奈新衣装 + 外部画像フォルダ化 === */
+(function(){
+  const LOOP2_YUKINA={
+    intro:'poses/yukina_loop2_pose5.png',
+    story:'poses/yukina_loop2_pose5.png',
+    map:'poses/yukina_loop2_icon.png',
+    poses:[
+      'poses/yukina_loop2_pose1.png',
+      'poses/yukina_loop2_pose2.png',
+      'poses/yukina_loop2_pose3.png',
+      'poses/yukina_loop2_pose4.png',
+      'poses/yukina_loop2_pose5.png',
+      'poses/yukina_loop2_pose6.png'
+    ]
+  };
+
+  function applyLoop2YukinaVisuals(){
+    try{
+      if(people&&people.outdoor){
+        people.outdoor.img=LOOP2_YUKINA.story;
+        people.outdoor.intro='白と金を基調にした和装風の雪奈が、扇子を手に人の流れと光を見ている。髪飾りと房飾りが揺れて、前回とはまったく違う雰囲気だ。';
+      }
+      if(typeof LOOP2_INTRO!=='undefined'){
+        LOOP2_INTRO.outdoor='雪奈は前回とはまったく雰囲気の違う和装風の衣装で立っていた。扇子と髪飾りが目を引く。目が合うと、前回のことを思い出したように少し笑った。';
+      }
+    }catch(e){console.error(e)}
+  }
+
+  const _origStartSecondLoop=startSecondLoop;
+  startSecondLoop=function(){
+    applyLoop2YUKINA();
+    return _origStartSecondLoop.apply(this,arguments);
+  };
+
+  function applyLoop2YUKINA(){
+    applyLoop2YukinaVisuals();
+    try{
+      const face=document.querySelector('.mapNpc[data-place="outdoor"] .mapFace');
+      if(face){face.src=LOOP2_YUKINA.map;face.removeAttribute('srcset');}
+    }catch(e){console.error(e)}
+  }
+
+  const _origInitVenueMap=initVenueMap;
+  initVenueMap=function(){
+    _origInitVenueMap.apply(this,arguments);
+    if(S&&S.loop===2)applyLoop2YUKINA();
+  };
+
+  const _origSyncMap=v47SyncMapFaces;
+  v47SyncMapFaces=function(){
+    _origSyncMap.apply(this,arguments);
+    if(S&&S.loop===2)applyLoop2YUKINA();
+  };
+
+  const _origStory=story;
+  story=function(p,sp,text,choices,img){
+    if(S&&S.loop===2&&p==='outdoor'){
+      applyLoop2YukinaVisuals();
+      if(!img||img===IMG.yukina||img===people.outdoor.img||/outdoor[0-5]|pose[1-6]|embedded_9788354d56372ea3/.test(String(img))){
+        img=LOOP2_YUKINA.story;
+      }
+    }
+    return _origStory.call(this,p,sp,text,choices,img);
+  };
+
+  const _origPoseImage=poseImage;
+  poseImage=function(place,pose){
+    if(S&&S.loop===2&&place==='outdoor'){
+      return LOOP2_YUKINA.poses[((pose||0)%LOOP2_YUKINA.poses.length+LOOP2_YUKINA.poses.length)%LOOP2_YUKINA.poses.length];
+    }
+    return _origPoseImage.call(this,place,pose);
+  };
+
+  function loop2YukinaOutfitTalk(){
+    story('outdoor','雪奈','「ありがとうございます。今回は前回と雰囲気を変えたくて、和っぽい感じにしてみたんです。扇子と髪飾りも合わせてきました」<br><span class="thought">（前回とはかなり違う。見た目だけを褒めるより、どこを見せたいか聞ければ会話として自然なはず。）</span>',[
+      ['「扇子と髪飾り、どっちを主役に見せたいですか？」',()=>{S.trust+=2;S.bond.outdoor+=3;story('outdoor','雪奈','「どっちも好きなんですけど、今日は扇子もちゃんと入れてもらえたらうれしいです」<br><span class="thought">（よし。撮る前に“見せたいポイント”が聞けた。）</span>',[['そのイメージで撮影の話に入る',()=>loop2ShootOffer('outdoor')]]);} ],
+      ['「前回と雰囲気変わって新鮮ですね。今日はどんな感じで撮りたいですか？」',()=>{S.trust+=2;S.bond.outdoor+=2;loop2ShootOffer('outdoor');}],
+      ['「前回の衣装の方が好みでした」',()=>{S.unease+=2;S.bond.outdoor=Math.max(-5,(S.bond.outdoor||0)-1);story('outdoor','雪奈','「あ、そうなんですね……」<br>雪奈は笑顔のまま返したが、空気は少しだけ冷えた。<br><span class="thought">（今それ言う必要、あったか？）</span>',[['すぐに話題を戻して希望を聞く',()=>{S.trust++;loop2ShootOffer('outdoor');}],['今日は挨拶だけして離れる',()=>show('map')]]);} ],
+      ['「衣装が華やかだから、前回と同じ感じで大丈夫ですよね？」',()=>{S.unease+=1;S.bond.outdoor=Math.max(-5,(S.bond.outdoor||0)-1);story('outdoor','雪奈','「今日は前回とちょっと変えたいなって思ってて……」<br><span class="thought">（“似てるから同じでいい”は、相手の準備を雑に扱った言い方だった。）</span>',[['希望を聞き直す',()=>{S.trust++;loop2ShootOffer('outdoor');}],['今日はやめておく',()=>show('map')]]);} ],
+      ['前回の話は短くして、今日の希望を聞く',()=>{S.trust+=2;S.bond.outdoor+=2;loop2ShootOffer('outdoor');}]
+    ]);
+  }
+
+  const _origLoop2NormalChoices=loop2NormalChoices;
+  loop2NormalChoices=function(p){
+    if(p!=='outdoor')return _origLoop2NormalChoices.apply(this,arguments);
+    const line=loop2RepGreeting(p)+'<br><span class="thought">（前回と衣装の方向性がまるで違う。ここに触れるなら、“似合ってる”だけで終わらせず、今日見せたいポイントまで聞けると自然そうだ。）</span>';
+    story('outdoor','雪奈',line,[
+      ['今日の衣装について聞く',()=>loop2YukinaOutfitTalk()],
+      ['前回の話は短くして、今日の希望を聞く',()=>{S.trust+=2;S.bond.outdoor+=2;loop2ShootOffer('outdoor');}],
+      [LAYER_AMBIGUOUS.outdoor.label,()=>ambiguousLayerChoice('outdoor',true)],
+      ['「覚えててくれたんですね！」と嬉しそうに返す',()=>{S.unease+=2;S.bond.outdoor--;loop2Landmine('outdoor');}],
+      ['今日は挨拶だけして離れる',()=>{S.rep++;show('map');}]
+    ]);
+  };
+
+  const _origStartLightweightPreload=startLightweightPreload;
+  startLightweightPreload=function(){
+    const pr=_origStartLightweightPreload.apply(this,arguments);
+    try{preloadGameImages([LOOP2_YUKINA.map].concat(LOOP2_YUKINA.poses));}catch(e){}
+    return pr;
+  };
+
+  window.addEventListener('load',()=>{
+    try{preloadGameImages([LOOP2_YUKINA.map].concat(LOOP2_YUKINA.poses));}catch(e){}
+  });
+})();
 </script></body></html>
