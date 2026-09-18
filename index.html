@@ -377,6 +377,32 @@
 .mapNpc[data-place="indoor"] .mapFace{object-position:center 3%!important}
 
 
+
+/* Ver.6.33 camera action no-crop hard fix */
+#shoot .shootView{background:#000!important;overflow:hidden!important;contain:layout paint style!important;isolation:isolate!important}
+#shoot .shootView #camImg,
+#shoot #camImg,
+#shoot .shootView img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  background:#000!important;
+}
+#shoot .shootView::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:#000;
+  z-index:0;
+}
+#shoot .shootView > *{z-index:1}
+
 /* Ver.6.12 pre-title prologue */
 #pretitle{background:#000;min-height:100dvh;overflow:hidden;align-items:center;justify-content:center;position:relative}
 .pretitleInner{position:relative;width:100%;height:100dvh;display:flex;align-items:center;justify-content:center;background:#000}
@@ -1244,7 +1270,7 @@ function v4CompositionFeedback(place,pose){
  return '構図：'+h+'　／　距離：'+d;
 }
 function poseHint(place,pose){let h={outdoor:['背景を少し入れたい','表情を寄り気味で','全身を見せたい','右側に余白がほしい','少し寄った構図','衣装全体を見せたい'],indoor:['黒衣装の陰影を強調','顔と上半身を寄りで','壁の余白を使いたい','縦のラインを意識','視線の先に余白','衣装の質感を寄りで'],rest:['自然な距離感で','座り姿を少し寄りで','休憩スペースも残す','表情中心','飲み物も入れる','自然な全身寄り'],east:['背景を大きく使う','光の方向へ余白','全身と背景','視線方向を空ける','作品っぽく寄る','背景込みで整える'],entrance:['入口の雰囲気も入れる','短時間なので表情重視','友達待ちの自然さ','視線方向に余白','少し寄って一枚','背景も残して撮る']};return (h[place]||h.outdoor)[pose%6]}
-function applyPoseLook(){let c=S.cam||{pose:0,x:0,z:1};let img=$('#camImg');img.style.filter='none';img.style.width='100%';img.style.height='100%';img.style.objectFit='cover';img.style.objectPosition='center center';img.style.left='50%';img.style.top='50%';img.style.transform=`translate(-50%,-50%) scale(${Math.max(1,c.z)})`;let f=$('.focus');if(f){let fx=Math.max(15,Math.min(85,50+c.x*.42));f.style.left=fx+'%'}}
+function applyPoseLook(){let c=S.cam||{pose:0,x:0,z:1};let img=$('#camImg');img.style.filter='none';img.style.width='100%';img.style.height='100%';img.style.objectFit='contain';img.style.objectPosition='center center';img.style.left='50%';img.style.top='50%';img.style.transform=`translate(-50%,-50%) scale(${c.z})`;img.style.transformOrigin='50% 50%';let f=$('.focus');if(f){let fx=Math.max(15,Math.min(85,50+c.x*.42));f.style.left=fx+'%'}}
 function startShoot(place='outdoor'){S.currentShoot=place;theme('shoot');show('shoot');S.shots=[];S.cam={x:0,z:1,pose:0};setImageNoFlash($('#camImg'),poseImage(place,0));let old=$('.shootName');if(old)old.remove();let nm=document.createElement('div');nm.className='shootName';nm.textContent='撮影：'+people[place].name;$('.shootView').appendChild(nm);let oldh=$('#shotHint');if(oldh)oldh.remove();let hint=document.createElement('div');hint.id='shotHint';hint.className='shotHint';$('.shootView').appendChild(hint);renderCam();v2Advance(20)}
 function renderCam(){let c=S.cam;applyPoseLook();let n=6-S.shots.length;$('#remain').textContent=`あと ${n} / 6 枚`;$('#countBig').textContent=`あと ${n} / 6 枚`;let h=$('#shotHint');if(h)h.innerHTML='構図ヒント：'+poseHint(S.currentShoot,c.pose)+'<br><b>'+v4CompositionFeedback(S.currentShoot,c.pose)+'</b>'}
 $$('[data-cam]').forEach(b=>b.onclick=()=>{click();let c=S.cam,a=b.dataset.cam;if(a==='left')c.x=Math.max(-70,c.x-18);if(a==='right')c.x=Math.min(70,c.x+18);if(a==='in')c.z=Math.min(1.30,c.z+.08);if(a==='out')c.z=Math.max(.82,c.z-.08);if(a==='center'){c.x=0;c.z=1}if(a==='pose'){c.pose=(c.pose+1)%6;setImageNoFlash($('#camImg'),poseImage(S.currentShoot,c.pose))}renderCam()});
