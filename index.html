@@ -640,9 +640,10 @@ function show(id){
  // 画像を差し替える画面は1フレーム待ち、前の画像が一瞬見えるのを防ぐ
  if(['story','shoot','select','end'].includes(id))requestAnimationFrame(activate);else activate();
 }
+/* Ver.6.34 audio boost */
 let masterVolume=1,soundMuted=false;
 function applyMasterAudio(){
-  if(fullBgm){fullBgm.muted=soundMuted;const base=(fullBgmKind==='happy'||fullBgmKind==='bad')?.94:(fullBgmKind==='field'?.86:.96);fullBgm.volume=Math.max(0,Math.min(1,base*masterVolume));}
+  if(fullBgm){fullBgm.muted=soundMuted;const base=(fullBgmKind==='happy'||fullBgmKind==='bad')?1.00:(fullBgmKind==='field'?.90:.99);fullBgm.volume=Math.max(0,Math.min(1,base*masterVolume));}
   const mb=document.getElementById('muteBtn');
   if(mb){mb.textContent=soundMuted?'🔇':'🔊';mb.setAttribute('aria-pressed',soundMuted?'true':'false');mb.title=soundMuted?'ミュート解除':'ミュート';}
 }
@@ -669,7 +670,7 @@ function theme(kind){
  kind=alias[kind]||kind;currentTheme=kind;fullBgmWanted=kind;
  let src=FULL_BGM[kind]||FULL_BGM.field,a=ensureFullBgm();
  if(fullBgmKind!==kind){a.pause();a.src=src;a.currentTime=0;fullBgmKind=kind}
- a.volume=((kind==='happy'||kind==='bad') ? .94 : (kind==='field' ? .86 : .96))*masterVolume;a.muted=soundMuted;
+ a.volume=((kind==='happy'||kind==='bad') ? 1.00 : (kind==='field' ? .90 : .99))*masterVolume;a.muted=soundMuted;
  let p=a.play();if(p&&p.catch)p.catch(()=>{audioNeedsResume=true});
 }
 function recoverFullAudio(){
@@ -728,7 +729,7 @@ function primeTitleBgm(){
    /* iPhone Safari対策：前口上中は音量0ではなくミュートで完全消音する。
       最初のタップで再生だけ開始しておき、タイトル表示時にミュート解除する。 */
    a.muted=true;
-   a.volume=.96*masterVolume;
+   a.volume=.99*masterVolume;
    let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true});
  }catch(e){audioNeedsResume=true}
 }
@@ -758,7 +759,7 @@ async function runTitlePrelude(){
    /* Ver.6.15: タイトル直前の音漏れ防止。
       ミュート状態のまま0:00へのシーク完了を待ち、その後だけ音を出す。 */
    a.muted=true;
-   a.volume=.96*masterVolume;
+   a.volume=.99*masterVolume;
    if(fullBgmKind==='title'){
      await new Promise(resolve=>{
        let settled=false;
@@ -1472,7 +1473,7 @@ function returnDirectToTitle(){
     let a=ensureFullBgm();
     fullBgmWanted='title';
     if(fullBgmKind!=='title'){a.pause();a.src=FULL_BGM.title;fullBgmKind='title'}
-    a.muted=true;a.volume=.96*masterVolume;
+    a.muted=true;a.volume=.99*masterVolume;
     try{a.currentTime=0}catch(e){}
     const start=()=>{a.muted=soundMuted;let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true})};
     if(a.readyState>=1)start();else a.addEventListener('loadedmetadata',start,{once:true});
