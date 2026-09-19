@@ -1618,38 +1618,6 @@ window.addEventListener('load',()=>{
     return [...(S.refused||[])].filter(p=>places.includes(p)&&!(S.shotDone&&S.shotDone.has(p))).length;
   }
 
-  function rawEndingSvg(){
-    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101217"/><stop offset="1" stop-color="#252b35"/></linearGradient>
-        <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#34302d"/><stop offset="1" stop-color="#191716"/></linearGradient>
-        <filter id="glow"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <rect width="1200" height="760" fill="url(#bg)"/>
-      <rect y="600" width="1200" height="160" fill="url(#desk)"/>
-      <ellipse cx="600" cy="620" rx="420" ry="34" fill="#000" opacity=".36"/>
-      <rect x="210" y="85" width="780" height="505" rx="18" fill="#090b0f" stroke="#59616f" stroke-width="8"/>
-      <rect x="238" y="115" width="724" height="438" rx="4" fill="#1b2028"/>
-      <rect x="270" y="150" width="410" height="330" rx="4" fill="#11151b"/>
-      <rect x="292" y="175" width="366" height="280" fill="#6e7686" opacity=".23"/>
-      <circle cx="474" cy="298" r="82" fill="#d2d4db" opacity=".14"/>
-      <path d="M294 425 C360 380 428 398 493 368 C552 340 600 354 656 320 L656 455 L294 455Z" fill="#9da4b2" opacity=".12"/>
-      <rect x="710" y="150" width="215" height="130" rx="6" fill="#11151b"/>
-      <polyline points="726,248 746,226 766,234 788,205 808,214 830,177 850,212 875,190 904,235" fill="none" stroke="#d6dbe5" stroke-width="4"/>
-      <text x="722" y="175" font-family="Arial,sans-serif" font-size="18" fill="#d7dce5">HISTOGRAM</text>
-      <g font-family="Arial,sans-serif" fill="#c5cad3" font-size="18">
-        <text x="710" y="322">EXPOSURE</text><rect x="710" y="338" width="210" height="8" rx="4" fill="#424956"/><circle cx="826" cy="342" r="10" fill="#d8dde6"/>
-        <text x="710" y="382">COLOR TEMP</text><rect x="710" y="398" width="210" height="8" rx="4" fill="#424956"/><circle cx="795" cy="402" r="10" fill="#d8dde6"/>
-        <text x="710" y="442">SHADOWS</text><rect x="710" y="458" width="210" height="8" rx="4" fill="#424956"/><circle cx="850" cy="462" r="10" fill="#d8dde6"/>
-      </g>
-      <g transform="translate(270 500)"><rect width="78" height="38" rx="4" fill="#59616f"/><rect x="88" width="78" height="38" rx="4" fill="#727a88"/><rect x="176" width="78" height="38" rx="4" fill="#4b5360"/><rect x="264" width="78" height="38" rx="4" fill="#646d7a"/><rect x="352" width="78" height="38" rx="4" fill="#535b68"/></g>
-      <rect x="535" y="590" width="130" height="46" rx="4" fill="#090b0f"/><rect x="470" y="632" width="260" height="18" rx="9" fill="#0b0d10"/>
-      <text x="600" y="48" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" letter-spacing="6" fill="#bfc5d0">RAW DEVELOP</text>
-      <text x="600" y="708" text-anchor="middle" font-family="sans-serif" font-size="32" font-weight="700" fill="#f3f5f7" filter="url(#glow)">今日のRAWを現像中</text>
-      <text x="600" y="738" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#b8bec8">撮れなかった相手もいる。それでも、撮れた一枚を仕上げていく。</text>
-    </svg>`;
-    return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
-  }
 
   const _setEndPosterMode=setEndPosterMode;
   setEndPosterMode=function(mode){ return _setEndPosterMode(mode); };
@@ -1657,14 +1625,8 @@ window.addEventListener('load',()=>{
   const _showEndPoster=showEndPoster;
   showEndPoster=function(){
     const ng=activeShotNgCount();
-    const current=endPosterMode;
-    if(ng>0 && current!=='bad'){
-      const ps=$('#posterScene'),img=$('#posterImg');
-      if(ps)ps.className='posterScene continue';
-      if(img){img.src=rawEndingSvg();img.alt='RAW現像中のエンディングアート';}
-      theme('field');show('postend');window.scrollTo({top:0,behavior:'auto'});
-      requestAnimationFrame(()=>requestAnimationFrame(()=>ps&&ps.classList.add('posterVisible')));
-      return;
+    if(ng>0 && endPosterMode!=='bad'){
+      endPosterMode='continue';
     }
     return _showEndPoster();
   };
