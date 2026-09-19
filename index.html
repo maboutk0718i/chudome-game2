@@ -478,7 +478,7 @@
 
 <section id="loading" class="screen active"><div class="loadingInner"><div class="loadingText">NOW LOADING...</div><div class="loadingSub">CHUDOME GAME DATA</div></div></section>
 <section id="pretitle" class="screen"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.32</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.33</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -1835,4 +1835,145 @@ window.addEventListener('load',()=>{
   try{v2Status();}catch(e){}
 })();
 </script>
+<script>
+/* === Ver.6.33 consistency patch: reputation / endings / loop2 reading flow === */
+(function(){
+  function lowRepRank(){
+    const r=typeof layerRepName==='function'?layerRepName():'';
+    return ['微妙なカメコ','要警戒カメコ','ブラックリスト級カメコ'].includes(r)?r:'';
+  }
+
+  /* 2) 2周目の会話と表示中の評判を一致させる */
+  const _loop2RepGreeting_consistency=loop2RepGreeting;
+  loop2RepGreeting=function(p){
+    const rank=lowRepRank();
+    if(!rank) return _loop2RepGreeting_consistency.apply(this,arguments);
+    const who=people[p]?.name||'相手';
+    const lines={
+      '微妙なカメコ':{
+        outdoor:'「……あ、前にもいましたよね」<br>雪奈は思い出したものの、少し距離を残したまま会釈した。',
+        indoor:'「前にもいましたよね」<br>りおは短く返し、こちらの様子を見ている。',
+        rest:'「あ、前のイベントの方ですよね」<br>みくは笑ったが、前回より少し慎重だ。',
+        east:'「前にも見かけました」<br>カレンは表情を変えず、反応を確かめている。',
+        entrance:'「前にもいましたよね？」<br>あやは友人の方を一度見てから返した。'
+      },
+      '要警戒カメコ':{
+        outdoor:'「……覚えてます」<br>雪奈の返事は丁寧だが、明らかに距離がある。',
+        indoor:'「覚えてます」<br>りおはそれだけ言って、スマホへ視線を戻した。',
+        rest:'「あ……覚えてます」<br>みくは椅子を少し引き、様子を見る。',
+        east:'「前回のこと、覚えてます」<br>カレンははっきりこちらを警戒している。',
+        entrance:'「……前にも来ましたよね」<br>あやは友人のそばから動かなかった。'
+      },
+      'ブラックリスト級カメコ':{
+        outdoor:'「……すみません。今日は話しかけないでもらえますか」<br>雪奈は友人の方へ体を向けた。',
+        indoor:'「用事がないなら、もう大丈夫です」<br>りおは目を合わせようとしない。',
+        rest:'「ごめんなさい。ちょっと近くに来ないでほしいです……」<br>みくは明確に距離を取った。',
+        east:'「撮影以前に、今日は関わらないでください」<br>カレンは迷わず言い切った。',
+        entrance:'「……友達もいるので、もう話しかけないでください」<br>あやは友人の後ろへ半歩下がった。'
+      }
+    };
+    return (lines[rank]?.[p]||`${who}は警戒した様子でこちらを見ている。`)+`<br><span class="thought">（レイヤー評判：${rank}。前回までの行動が、会話の前から残っている。）</span>`;
+  };
+
+  const _loop2ShootOffer_consistency=loop2ShootOffer;
+  loop2ShootOffer=function(p){
+    const rank=lowRepRank();
+    if(rank==='要警戒カメコ'||rank==='ブラックリスト級カメコ'){
+      const P=people[p];
+      refuse(p);
+      const line=rank==='ブラックリスト級カメコ'
+        ?'「……撮影は無理です。もう声をかけないでください」<br>返事は短く、完全に線を引かれた。'
+        :'「今日は撮影しません」<br>相手は迷わず首を振った。';
+      story(p,P.name,line+`<br><span class="thought">（今の評判は「${rank}」。ここで押すほど悪化するだけだ。）</span>`,[
+        ['「わかりました」と離れる',()=>{S.backedOff++;show('map')}]
+      ]);
+      return;
+    }
+    return _loop2ShootOffer_consistency.apply(this,arguments);
+  };
+
+  /* 3) NGが1人でもいるのにHAPPY本文へ入らない */
+  function showNgContinue(loop2=false){
+    setEndPosterMode('continue');
+    theme('field');show('end');$('#ending').className='endScene';
+    const q=secondLoopStats();
+    $('#endTitle').textContent=loop2?'CONTINUE END　二度目も全員ではなかった':'CONTINUE END　撮れた写真を仕上げる夜';
+    $('#endBody').innerHTML=`<div class="endGallery"><img class="wide" src="${IMG.venue}"></div>
+      <div class="endChapter">${loop2?'二度目のちゅどーむ ― 帰宅後':'帰宅後 ― PCの前'}</div>
+      <div class="endText">撮れなかった相手もいた。<br>マボは今日撮れたRAWデータをPCへ取り込み、一枚ずつ見返していく。<br><br>露出を整え、色を追い込む。全員は撮れなかった。それでも、撮れた写真まで無駄になるわけじゃない。</div>
+      <div class="endImpact">（こういう日もある。次は、撮る前のところからもう少しうまくやろう。）</div>
+      <div class="endText"><b>撮影済 ${q.done}人 ／ 撮影NG ${q.ng}人</b><br>レイヤー評判：${layerRepName()}</div>`;
+  }
+
+  const _finishDayEnding_consistency=finishDayEnding;
+  finishDayEnding=function(){
+    if(S.loop===2) return _finishDayEnding_consistency.apply(this,arguments);
+    const ng=secondLoopStats().ng;
+    if(!ng) return _finishDayEnding_consistency.apply(this,arguments);
+    const layerRisk=S.creep+S.rude;
+    const socialRisk=S.unease+S.rivalFlags+(S.camRep<=-3?2:0);
+    const protectedRep=layerBadProtected();
+    const isBad=(S.camRep<=-5&&S.camHostile)||S.warningIncidents.length>0||(!protectedRep&&S.camRep<=-5)||(!protectedRep&&(S.pressureLog.length>0||layerRisk>=4))||(!protectedRep&&socialRisk>=7);
+    if(isBad) return _finishDayEnding_consistency.apply(this,arguments);
+    return showNgContinue(false);
+  };
+
+  const _secondLoopEnding_consistency=secondLoopEnding;
+  secondLoopEnding=function(){
+    const q=secondLoopStats();
+    if(!q.ng) return _secondLoopEnding_consistency.apply(this,arguments);
+    const priorBad=S.priorRefused?.size||0;
+    const severe=S.warningIncidents.length>0||S.pressureLog.length>=2||S.creep>=3||S.rude>=3||(priorBad>0&&S.pressureLog.length>0);
+    const protectedRep=layerBadProtected();
+    const isBad=(S.camRep<=-5&&S.camHostile)||S.warningIncidents.length>0||(!protectedRep&&S.camRep<=-5)||(!protectedRep&&severe)||(!protectedRep&&(S.pressureLog.length>0||S.creep+S.rude>=3||S.unease+S.rivalFlags>=8));
+    if(isBad) return _secondLoopEnding_consistency.apply(this,arguments);
+    return showNgContinue(true);
+  };
+
+  /* 4) 重要な「即マップ」分岐に短いやり取りを追加 */
+  const _loop2NormalChoices_reading=loop2NormalChoices;
+  loop2NormalChoices=function(p){
+    const rank=lowRepRank();
+    if(rank) return _loop2NormalChoices_reading.apply(this,arguments);
+    const P=people[p];
+    const line=loop2RepGreeting(p);
+    const good=['前回の話は短くして、今日の希望を聞く',()=>{S.trust+=2;S.bond[p]+=2;loop2ShootOffer(p)}];
+    const amb=[LAYER_AMBIGUOUS[p].label,()=>ambiguousLayerChoice(p,true)];
+    const mine=['「覚えててくれたんですね！」と嬉しそうに返す',()=>{S.unease+=2;S.bond[p]--;loop2Landmine(p)}];
+    const leave=['今日は挨拶だけして離れる',()=>{S.rep++;story(p,P.name,'「それじゃ、また」<br>'+P.name+'は短く会釈した。<br><span class="thought">（撮らないで終わる会話もある。変に一言足さず、今日はここで切る。）</span>',[['そのまま離れる',()=>show('map')]])}];
+    const orders={outdoor:[amb,good,leave,mine],indoor:[mine,leave,good,amb],rest:[amb,mine,leave,good],east:[leave,amb,mine,good],entrance:[mine,good,amb,leave]};
+    story(p,P.name,line,orders[p]||[amb,good,mine,leave]);
+  };
+
+  const _visitLoop2_reading=visitLoop2;
+  visitLoop2=function(p){
+    if(p==='rivals') return _visitLoop2_reading.apply(this,arguments);
+    if(S.shotDone.has(p)||S.priorRefused.has(p)||!(S.priorMet&&S.priorMet.has(p))) return _visitLoop2_reading.apply(this,arguments);
+    if(S.refused.has(p)){
+      const P=people[p];
+      story(p,P.name,'「今日はもう撮影しません」<br><span class="thought">（二周目でも、一度出た答えは変わらない。）</span>',[
+        ['「わかりました。すみません」と離れる',()=>{S.backedOff++;story(p,P.name,'「……はい」<br>返事はそれだけだった。<br><span class="thought">（これ以上は何も足さない。ここで終わりにする。）</span>',[['離れる',()=>show('map')]])}],
+        ['何も言わず離れる',()=>story(p,'マボ','マボはカメラを下げ、そのまま距離を取った。<br><span class="thought">（今は声を掛けないことも選択肢だ。）</span>',[['マップへ戻る',()=>show('map')]])]
+      ]);return;
+    }
+    return _visitLoop2_reading.apply(this,arguments);
+  };
+
+  /* 5) みく2周目初対面の選択肢を重複しない文言へ整理 */
+  const _loop2FirstMeet_unique=loop2FirstMeet;
+  loop2FirstMeet=function(p){
+    if(p!=='rest') return _loop2FirstMeet_unique.apply(this,arguments);
+    const P=people[p];
+    const intro=P.intro+'<br><span class="thought">（この人とは前回話していない。二周目の俺には見覚えがあっても、向こうにとっては今日が初対面だ。）</span>';
+    story(p,'マボ',intro,[
+      [LAYER_AMBIGUOUS.rest.label,()=>ambiguousLayerChoice('rest',true)],
+      ['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],
+      ['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],
+      ['「休憩の邪魔をしないよう、あとで声をかけます」と伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],
+      ['マップへ戻る',()=>show('map')]
+    ]);
+  };
+})();
+</script>
+
 </body></html>
