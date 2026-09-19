@@ -455,6 +455,22 @@
 #loading.loadingLeaving{opacity:0;transition:opacity .9s ease}
 @keyframes loadingPulse{0%,100%{opacity:.22}50%{opacity:1}}
 </style>
+
+<style id="rank-layout-final-fix">
+#v2status .statusValue.blacklistRank{
+  color:#ff3b30!important;
+  -webkit-text-fill-color:#ff3b30!important;
+  font-weight:900!important;
+  text-shadow:0 0 10px rgba(255,59,48,.38)!important;
+}
+@media(max-width:520px){
+  #v2status{grid-template-columns:minmax(0,1.62fr) minmax(88px,.38fr)!important;}
+  #v2status .layerRepCell{padding-right:4px!important;}
+  #v2status .layerRepCell .statusValue{font-size:18px!important;}
+  #v2status .camRepCell{padding-left:24px!important;transform:translateX(6px)!important;}
+  #v2status .camRepCell .statusLabel,#v2status .camRepCell .statusValue{text-align:left!important;}
+}
+</style>
 </head><body>
 <div class="audioControl" id="audioControl" aria-label="サウンド切替">
   <button type="button" id="muteBtn" aria-label="ミュート切替" title="ミュート切替" aria-pressed="false">🔊</button>
@@ -565,7 +581,7 @@ function v4Closing(){
 }
 function v2Clock(){let h=Math.floor(Math.min(S.timeMin,900)/60),m=Math.min(S.timeMin,900)%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
 function v2Advance(n){v2Status()}
-function v2Status(){let e=$('#v2status');if(!e)return;let r=layerRepScore();let rt=layerRepName();let cr=S.camRep>=2?'良好':S.camRep<=-3?'悪評':'普通';let lc=(rt==='神カメコ'||r>=9)?'good':'mid';let cc=S.camRep>=2?'good':S.camRep<=-3?'bad':'mid';e.innerHTML='<div class="statusCell timeCell"><span class="statusLabel">現在時刻</span><span class="statusValue timeValue">'+v2Clock()+'</span></div><div class="statusCell"><span class="statusLabel">レイヤー評判</span><span class="statusValue '+lc+'">'+rt+'</span></div><div class="statusCell"><span class="statusLabel">カメコ評判</span><span class="statusValue '+cc+'">'+cr+(S.secondLoop?' ★':'')+'</span></div>';}
+function v2Status(){let e=$('#v2status');if(!e)return;let r=layerRepScore();let rt=layerRepName();let cr=S.camRep>=2?'良好':S.camRep<=-3?'悪評':'普通';let isBlacklist=rt==='ブラックリスト級カメコ';let lc=isBlacklist?'blacklistRank':((rt==='神カメコ'||r>=9)?'good':'mid');let cc=S.camRep>=2?'good':S.camRep<=-3?'bad':'mid';let blacklistStyle=isBlacklist?' style="color:#ff3b30!important;-webkit-text-fill-color:#ff3b30!important;font-weight:900!important;text-shadow:0 0 10px rgba(255,59,48,.38)!important"':'';e.innerHTML='<div class="statusCell timeCell"><span class="statusLabel">現在時刻</span><span class="statusValue timeValue">'+v2Clock()+'</span></div><div class="statusCell layerRepCell"><span class="statusLabel">レイヤー評判</span><span class="statusValue '+lc+'"'+blacklistStyle+'>'+rt+'</span></div><div class="statusCell camRepCell"><span class="statusLabel">カメコ評判</span><span class="statusValue '+cc+'">'+cr+(S.secondLoop?' ★':'')+'</span></div>';}
 function v2Propagation(p){let a=[...S.shotDone].filter(x=>x!==p);if(a.length&&S.rep>=2){let n=people[a[0]]?.name||'別のレイヤー';return '<div class="v2event">💬 「さっき'+n+'さんを撮ってましたよね」<br>会場内で少しずつ名前が伝わっている。</div>'}if(S.unease>=3||S.rude>=2)return '<div class="v2event">💬 一瞬だけ警戒するような視線を感じる。会場では行動も人づてに伝わる。</div>';return ''}
 function v2Result(){let a=Object.values(S.photoScores),avg=a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;let tech=Math.max(0,Math.min(100,avg)),comm=Math.max(0,Math.min(100,50+(S.trust+S.rep)*8-S.unease*6)),dist=Math.max(0,Math.min(100,80+S.backedOff*6-S.creep*12-S.rude*8-S.warningIncidents.length*40)),cam=Math.max(0,Math.min(100,55+S.camRep*8-S.rivalFlags*4)),total=Math.round((tech+comm+dist+cam)/4),grade=total>=90?'S':total>=80?'A':total>=70?'B':total>=60?'C':total>=45?'D':'E';if(!v4AllShot()&&(grade==='S'||grade==='A'))grade='B';if(S.loop===1&&grade==='S')grade='A';if(S.loop===2){let priorAll=['outdoor','indoor','rest','east','entrance'].every(p=>S.priorShot.has(p));if((!priorAll||!v4AllShot())&&(grade==='S'||grade==='A'))grade='B';}return {avg,tech,comm,dist,cam,total,grade}}
 function v2ResultHTML(){let r=v2Result();return '<div class="resultCard"><h3>本日のカメコ評価</h3><div class="rankBig">'+r.grade+'</div><div>撮影技術：'+r.tech+'　コミュ力：'+r.comm+'<br>距離感：'+r.dist+'　カメコ評判：'+r.cam+'<br>撮影人数：'+S.shotDone.size+'/5　写真平均：'+r.avg+'点<br>終了時刻：'+v2Clock()+'　総合：'+r.total+'</div><p><b>野良カメコ Lv.'+Math.max(1,Math.floor(r.total/10))+'</b></p></div>'}
@@ -660,6 +676,7 @@ const FULL_BGM={
  shoot:'audio/shot.mp3',rival:'audio/kameko.mp3',happy:'audio/happy.mp3',bad:'audio/bad.mp3'
 };
 let fullBgm=null,fullBgmKind='',fullBgmWanted='';
+let titleBgmPriming=false,titleBgmPrimePromise=null;
 initAudioControls();
 function ensureFullBgm(){
  if(fullBgm)return fullBgm;
@@ -674,7 +691,7 @@ function theme(kind){
  let p=a.play();if(p&&p.catch)p.catch(()=>{audioNeedsResume=true});
 }
 function recoverFullAudio(){
- if(!fullBgmWanted)return;
+ if(!fullBgmWanted||titleBgmPriming)return;
  try{let a=ensureFullBgm();if(fullBgmKind!==fullBgmWanted){fullBgmKind='';theme(fullBgmWanted);return}
  let p=a.play();if(p&&p.catch)p.catch(()=>{audioNeedsResume=true});audioNeedsResume=false}catch(e){audioNeedsResume=true}
 }
@@ -720,26 +737,48 @@ try{let old=$('#secondLoopBtn');if(old)old.remove()}catch(e){}
 let preludeRunning=false;
 function primeTitleBgm(){
  unlock();
- try{
-   let a=ensureFullBgm();
-   fullBgmWanted='title';
-   if(fullBgmKind!=='title'){
-     a.pause();a.src=FULL_BGM.title;fullBgmKind='title';
-   }
-   /* Ver.6.33: 前口上の最初のタップでタイトル曲を0:00に準備する。
-      iPhone Safariの再生許可だけ先に通し、前口上中は曲を進めない。 */
-   a.muted=true;
-   a.volume=.99*masterVolume;
-   try{a.currentTime=0}catch(e){}
-   let pr=a.play();
-   if(pr&&pr.then){
-     pr.then(()=>{
-       try{a.pause();a.currentTime=0}catch(e){}
-     }).catch(()=>{audioNeedsResume=true});
-   }else{
-     try{a.pause();a.currentTime=0}catch(e){}
-   }
- }catch(e){audioNeedsResume=true}
+ if(titleBgmPrimePromise)return titleBgmPrimePromise;
+ titleBgmPriming=true;
+ titleBgmPrimePromise=new Promise(resolve=>{
+   try{
+     let a=ensureFullBgm();
+     fullBgmWanted='title';
+     if(fullBgmKind!=='title'){
+       a.pause();a.src=FULL_BGM.title;fullBgmKind='title';
+     }
+     a.muted=true;
+     a.volume=.99*masterVolume;
+     const finish=()=>{
+       try{a.pause()}catch(e){}
+       const done=()=>{
+         try{a.currentTime=0}catch(e){}
+         titleBgmPriming=false;
+         resolve();
+       };
+       try{
+         if(Math.abs((a.currentTime||0))<0.01){done();return}
+         const onSeek=()=>{a.removeEventListener('seeked',onSeek);done()};
+         a.addEventListener('seeked',onSeek,{once:true});
+         a.currentTime=0;
+         setTimeout(()=>{try{a.removeEventListener('seeked',onSeek)}catch(e){};done()},700);
+       }catch(e){done()}
+     };
+     const begin=()=>{
+       try{a.currentTime=0}catch(e){}
+       let pr=a.play();
+       if(pr&&pr.then)pr.then(()=>setTimeout(finish,0)).catch(()=>{audioNeedsResume=true;finish()});
+       else finish();
+     };
+     if(a.readyState>=1)begin();
+     else{
+       const onMeta=()=>{a.removeEventListener('loadedmetadata',onMeta);begin()};
+       a.addEventListener('loadedmetadata',onMeta,{once:true});
+       a.load();
+       setTimeout(()=>{try{a.removeEventListener('loadedmetadata',onMeta)}catch(e){};begin()},1200);
+     }
+   }catch(e){audioNeedsResume=true;titleBgmPriming=false;resolve()}
+ });
+ return titleBgmPrimePromise;
 }
 function showPreludeLine(html,small=false){
  return new Promise(resolve=>{
@@ -759,6 +798,7 @@ async function runTitlePrelude(){
  await new Promise(r=>setTimeout(r,650));
  await showPreludeLine('そして、ちゅどーむへ——');
  await new Promise(r=>setTimeout(r,700));
+ await primeTitleBgm();
  first=true;
  const title=$('#title');if(title)title.classList.add('pretitleArrival');
  show('title');
@@ -1469,7 +1509,7 @@ function resetTitleScreen(){
   const ps=$('#preludeStart');
   if(ps){ps.disabled=false;ps.style.opacity='1';ps.style.pointerEvents='auto'}
   const pt=$('#preludeText');if(pt){pt.className='';pt.innerHTML=''}
-  preludeRunning=false;
+  preludeRunning=false;titleBgmPrimePromise=null;titleBgmPriming=false;
   show('pretitle');
   requestAnimationFrame(()=>{
     window.scrollTo(0,0);
@@ -1481,7 +1521,7 @@ function resetTitleScreen(){
 
 function returnDirectToTitle(){
   clearInterval(timer);timer=null;currentTheme=null;first=true;audioNeedsResume=false;
-  S=freshGameState();updateShotStatus();preludeRunning=false;
+  S=freshGameState();updateShotStatus();preludeRunning=false;titleBgmPrimePromise=null;titleBgmPriming=false;
   const pt=$('#preludeText');if(pt){pt.className='';pt.innerHTML=''}
   const ps=$('#preludeStart');if(ps){ps.disabled=false;ps.style.opacity='1';ps.style.pointerEvents='auto'}
   const press=$('#press');if(press){press.textContent='ゲームをはじめる';press.style.removeProperty('display');press.style.removeProperty('visibility');press.style.removeProperty('opacity');press.style.removeProperty('pointer-events');press.disabled=false}
@@ -1761,4 +1801,38 @@ window.addEventListener('load',()=>{
 })();
 </script>
 
+
+<style>
+/* status layout fix: blacklist emphasis + mobile spacing */
+#v2status .statusValue.blacklistRank{
+  color:#ff3b30!important;
+  font-weight:900!important;
+  text-shadow:0 0 10px rgba(255,59,48,.38)!important;
+}
+@media(max-width:520px){
+  #v2status{grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr)!important;}
+  #v2status .statusCell:nth-child(3){padding-left:18px!important;}
+  #v2status .statusCell:nth-child(2) .statusValue{font-size:19px!important;}
+}
+</style>
+<script>
+/* status render hard-fix: blacklist rank must be red */
+(function(){
+  const _v2Status_rankLayoutFix=v2Status;
+  v2Status=function(){
+    const r=_v2Status_rankLayoutFix.apply(this,arguments);
+    try{
+      const cells=[...document.querySelectorAll('#v2status .statusCell')];
+      const layerCell=cells.find(c=>c.querySelector('.statusLabel')?.textContent.trim()==='レイヤー評判');
+      const value=layerCell?.querySelector('.statusValue');
+      if(value){
+        value.classList.toggle('blacklistRank',value.textContent.trim()==='ブラックリスト級カメコ');
+        if(value.classList.contains('blacklistRank')) value.style.setProperty('color','#ff3b30','important');
+      }
+    }catch(e){}
+    return r;
+  };
+  try{v2Status();}catch(e){}
+})();
+</script>
 </body></html>
