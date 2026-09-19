@@ -724,13 +724,21 @@ function primeTitleBgm(){
    let a=ensureFullBgm();
    fullBgmWanted='title';
    if(fullBgmKind!=='title'){
-     a.pause();a.src=FULL_BGM.title;a.currentTime=0;fullBgmKind='title';
+     a.pause();a.src=FULL_BGM.title;fullBgmKind='title';
    }
-   /* iPhone Safari対策：前口上中は音量0ではなくミュートで完全消音する。
-      最初のタップで再生だけ開始しておき、タイトル表示時にミュート解除する。 */
+   /* Ver.6.33: 前口上の最初のタップでタイトル曲を0:00に準備する。
+      iPhone Safariの再生許可だけ先に通し、前口上中は曲を進めない。 */
    a.muted=true;
    a.volume=.99*masterVolume;
-   let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true});
+   try{a.currentTime=0}catch(e){}
+   let pr=a.play();
+   if(pr&&pr.then){
+     pr.then(()=>{
+       try{a.pause();a.currentTime=0}catch(e){}
+     }).catch(()=>{audioNeedsResume=true});
+   }else{
+     try{a.pause();a.currentTime=0}catch(e){}
+   }
  }catch(e){audioNeedsResume=true}
 }
 function showPreludeLine(html,small=false){
@@ -756,21 +764,9 @@ async function runTitlePrelude(){
  show('title');
  try{
    let a=ensureFullBgm();
-   /* Ver.6.15: タイトル直前の音漏れ防止。
-      ミュート状態のまま0:00へのシーク完了を待ち、その後だけ音を出す。 */
-   a.muted=true;
+   /* Ver.6.33: 0:00への準備は前口上中に完了済み。
+      タイトル表示時はシークを挟まず、そのまま曲頭から再生する。 */
    a.volume=.99*masterVolume;
-   if(fullBgmKind==='title'){
-     await new Promise(resolve=>{
-       let settled=false;
-       const finish=()=>{if(settled)return;settled=true;a.removeEventListener('seeked',finish);resolve()};
-       a.addEventListener('seeked',finish,{once:true});
-       try{a.currentTime=0}catch(e){finish();return}
-       /* seekedが来ない端末でも固まらないための保険 */
-       setTimeout(finish,350);
-     });
-   }
-   /* 前口上中から再生自体は継続しているので、ここで初めてミュート解除 */
    a.muted=soundMuted;
    let pr=a.play();if(pr&&pr.catch)pr.catch(()=>{audioNeedsResume=true});
  }catch(e){}
@@ -1013,7 +1009,7 @@ function loop2FirstMeet(p){
    ['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],
    ['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],
    [LAYER_AMBIGUOUS.indoor.label,()=>ambiguousLayerChoice('indoor',true)],
-   ['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],
+   ['衣装の質感について聞く',()=>rioTextureTalk()],
    ['マップへ戻る',()=>show('map')]
   ]);return;
  }
@@ -1168,7 +1164,7 @@ function visit(p){
  if(S.shotDone.has(p)){postShootVisit(p);return}
  if(S.refused.has(p)){story(p,P.name,P.intro+'<br><span class="thought">（この人には一度撮影を断られている。今日はもう撮影をお願いしない。）</span>',[['挨拶だけする',()=>{S.rep++;show('map')}],['静かにその場を離れる',()=>show('map')],['マップへ戻る',()=>show('map')]]);return}
  if(p==='outdoor'){story(p,'マボ',P.intro+'<br><span class="thought">（いきなりカメラを向けるのは違う。まず、どう入る……？）</span>',[[LAYER_AMBIGUOUS.outdoor.label,()=>ambiguousLayerChoice('outdoor')],['脳内で声かけを3回リハーサルする',()=>yukinaRehearsal()],['撮影できるタイミングか確認する',()=>{S.trust++;talk(p)}],['雪奈に短く挨拶する',()=>talk(p)],['マップへ戻る',()=>show('map')]]);return}
- if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。……でも知ったかぶりは一発でバレる。作品の話を聞くか、俺の撮りたい絵を短く伝えるか。）</span>',[[LAYER_AMBIGUOUS.indoor.label,()=>ambiguousLayerChoice('indoor')],['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['衣装の質感について聞く',()=>{S.trust+=2;S.bond.indoor+=2;other('indoor',true)}],['マップへ戻る',()=>show('map')]]);return}
+ if(p==='indoor'){story(p,'マボ',P.intro+'<br><span class="thought">（黒衣装と壁の陰影が合いそうだ。……でも知ったかぶりは一発でバレる。作品の話を聞くか、俺の撮りたい絵を短く伝えるか。）</span>',[[LAYER_AMBIGUOUS.indoor.label,()=>ambiguousLayerChoice('indoor')],['衣装の一部を指して「そこ触って直していい？」と聞く',()=>layerTrap('indoor')],['「暗めの雰囲気で撮りたい」と提案する',()=>{S.trust++;S.bond.indoor++;other('indoor',true)}],['衣装の質感について聞く',()=>rioTextureTalk()],['マップへ戻る',()=>show('map')]]);return}
  if(p==='rest'){story(p,'マボ',P.intro+'<br><span class="thought">（休憩中だ。ここで撮影を急かしたら、写真以前の問題になる。……でも声だけ掛けて存在を覚えてもらいたい欲もある。欲、引っ込め。）</span>',[[LAYER_AMBIGUOUS.rest.label,()=>ambiguousLayerChoice('rest')],['「休憩してる自然な感じも一枚いい？」と頼む',()=>layerTrap('rest')],['休憩が終わるまで離れて待つ',()=>{S.trust+=2;S.bond.rest+=2;observe('rest')}],['「休憩後で大丈夫です」とだけ伝える',()=>{S.trust++;S.bond.rest++;other('rest',true)}],['マップへ戻る',()=>show('map')]]);return}
  if(p==='east'){story(p,'マボ',P.intro+'<br><span class="thought">（背景と光を見ている。カレンは作品としての完成度を気にしてそうだ。どこまで任せて、どこから自分の意図を出すか……。）</span>',[['「カレンさんのやりやすい感じでお願いします」と任せる',()=>layerTrap('east')],[LAYER_AMBIGUOUS.east.label,()=>ambiguousLayerChoice('east')],['カレンの希望する構図を聞く',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['「この背景を活かして撮りたい」と話す',()=>{S.trust+=2;S.bond.east+=2;other('east',true)}],['マップへ戻る',()=>show('map')]]);return}
  story(p,'マボ',P.intro+'<br><span class="thought">（友達待ちなら長話はできない。短時間で済むことを先に伝える。……「せっかく来たんだから」は俺の都合。飲み込め。）</span>',[['まず軽く挨拶して待ち時間を聞く',()=>{S.trust++;S.bond.entrance++;talk('entrance')}],[LAYER_AMBIGUOUS.entrance.label,()=>ambiguousLayerChoice('entrance')],['「友達が来てもあと5分だけ」と先に頼む',()=>layerTrap('entrance')],['「友達が来るまで2〜3分だけ」と確認する',()=>{S.trust+=2;S.bond.entrance+=2;other('entrance',true)}],['マップへ戻る',()=>show('map')]])
@@ -1685,4 +1681,84 @@ window.addEventListener('load',()=>{
   };
 })();
 </script>
+
+<script>
+/* === Ver6.33 patch: 評判下位ランク / りお質感会話 / 2周目再拒否分岐 === */
+(function(){
+  const BASE_LAYER_REP_LABELS=['無名','顔を覚えられ始めた','少し知られている','好印象','評判が良い','信頼されている','人気カメコ'];
+
+  function currentNgCount(){
+    const places=['outdoor','indoor','rest','east','entrance'];
+    return [...(S.refused||[])].filter(p=>places.includes(p)&&!(S.shotDone&&S.shotDone.has(p))).length;
+  }
+  function repDangerLevel(){
+    const ng=currentNgCount();
+    const warnings=(S.warningIncidents||[]).length;
+    const pressures=(S.pressureLog||[]).length;
+    if(warnings>=2 || S.creep>=5 || S.rude>=5 || (ng>=3 && (S.unease>=5 || pressures>=1))) return 3;
+    if(warnings>=1 || S.creep>=3 || S.rude>=3 || ng>=2 || S.unease>=7) return 2;
+    if(ng>=1 || S.unease>=4 || S.rude>=2 || S.creep>=2) return 1;
+    return 0;
+  }
+
+  layerRepName=function(){
+    if(typeof isGodKameko==='function' && isGodKameko()) return '神カメコ';
+    const danger=repDangerLevel();
+    if(danger===3) return 'ブラックリスト級カメコ';
+    if(danger===2) return '要警戒カメコ';
+    if(danger===1) return '微妙なカメコ';
+    return BASE_LAYER_REP_LABELS[layerRepTier()];
+  };
+
+  const _v2Status_v633=v2Status;
+  v2Status=function(){
+    _v2Status_v633();
+    try{
+      const values=[...document.querySelectorAll('#v2status .statusValue')];
+      const rep=values.find(el=>el.textContent.includes('ブラックリスト級カメコ'));
+      if(rep){rep.style.color='#ff3b30';rep.style.fontWeight='900';rep.style.textShadow='0 0 10px rgba(255,59,48,.35)';}
+    }catch(e){}
+  };
+
+  const _secondLoopEnding_v633=secondLoopEnding;
+  secondLoopEnding=function(){
+    const r=_secondLoopEnding_v633.apply(this,arguments);
+    try{
+      const body=$('#endBody');
+      if(body&&body.innerHTML.includes('ブラックリスト級カメコ')){
+        body.innerHTML=body.innerHTML.replaceAll('ブラックリスト級カメコ','<span style="color:#ff3b30;font-weight:900;text-shadow:0 0 10px rgba(255,59,48,.35)">ブラックリスト級カメコ</span>');
+      }
+    }catch(e){}
+    return r;
+  };
+
+  window.rioTextureTalk=function(){
+    S.trust+=1;
+    story('indoor','りお','「この生地、光が当たると少し透ける感じになるんです。そこが気に入ってて」<br><span class="thought">（ちゃんと理由があるんだな。ここからの一言で“衣装を見てる人”にも“分かったふりする人”にもなる。）</span>',[
+      ['「じゃあ、その透け感が出る位置で撮りたいです」',()=>{S.trust+=2;S.rep++;S.bond.indoor=(S.bond.indoor||0)+2;story('indoor','りお','「それ、いいですね。光が入るところでお願いします」<br><span class="thought">（見せたい部分を拾えた。これは素直に撮影へつなげてよさそうだ。）</span>',[['撮影をお願いする',()=>other('indoor',true)]])}],
+      ['「なるほど、結構高そうな生地ですね」',()=>{S.unease++;S.bond.indoor=Math.max(-5,(S.bond.indoor||0)-1);story('indoor','りお','「……値段は別に、そこじゃないです」<br>りおは一瞬だけ視線を落とした。<br><span class="thought">（質感の話から値段に飛んだ。聞きたかったのはそこじゃなかったらしい。）</span>',[['話を戻して撮影の希望を聞く',()=>other('indoor',true)],['今日は離れる',()=>show('map')]])}],
+      ['「写真なら加工で何とでもなりますよ」',()=>{S.unease+=3;S.rude++;S.bond.indoor=Math.max(-5,(S.bond.indoor||0)-2);story('indoor','りお','「……それなら、衣装を工夫した意味ないですよね」<br>りおの声が明らかに冷たくなった。<br><span class="thought">（最悪だ。相手がこだわってる部分を“後で直せる”で片付けた。）</span>',[['「すみません、言い方が悪かったです」と引く',()=>{S.backedOff++;show('map')}],['それでも撮影をお願いする',()=>{S.unease+=2;refuse('indoor');story('indoor','りお','「今日はやめておきます」',[['離れる',()=>show('map')]])}]])}]
+    ]);
+  };
+
+  loop2WaryVisit=function(p){
+    const P=people[p],R=LOOP2_WARY_REPLIES[p]||LOOP2_WARY_REPLIES.outdoor;
+    story(p,P.name,LOOP2_WARY[p]+'<br><span class="thought">（覚えられてる。しかも悪い方で。今日は“撮る”より先に、“怖がらせない”が正解だ。）</span>',[
+      ['「前回はすみませんでした」と謝って離れる',()=>{S.backedOff++;S.unease++;refuse(p);story(p,P.name,R.apology,[['何も足さず離れる',()=>show('map')]])}],
+      ['今日は撮影を頼まず、挨拶だけする',()=>{S.backedOff++;S.unease++;refuse(p);story(p,P.name,R.hello,[['そのまま離れる',()=>show('map')]])}],
+      ['「今回は大丈夫なので」と撮影をお願いする',()=>{
+        S.unease+=3;refuse(p);
+        story(p,P.name,'「……そういう意味じゃなくて、今日は撮影しません」<br>相手ははっきり言い直した。<br><span class="thought">（“今回は大丈夫”を決めるのは俺じゃない。）</span>',[
+          ['「わかりました。すみませんでした」と引く',()=>{S.backedOff++;show('map')}],
+          ['「前回よりちゃんと気をつけてるんですけど……」と食い下がる',()=>{S.unease+=2;S.rude++;S.bond[p]=Math.max(-5,(S.bond[p]||0)-2);story(p,P.name,'「そういう話じゃないです。撮られたくないって言ってます」<br>返事は短く、はっきりしていた。<br><span class="thought">（改善したかどうかを判定するのは俺じゃない。拒否は拒否だ。）</span>',[['もう何も言わず離れる',()=>show('map')]])}],
+          ['「一枚だけでもダメですか？」ともう一度頼む',()=>{recordWarningIncident(p,'明確な再拒否後に「一枚だけ」と再依頼');S.bond[p]=Math.max(-5,(S.bond[p]||0)-3);story(p,P.name,'「何回言えば分かります？」<br>周囲の視線がこちらへ向いた。<br><span class="thought">（“一枚だけ”は譲歩じゃない。断られた相手にとっては、もう一回断らせただけだ。）</span>',[['ここでようやく離れる',()=>show('map')]])}],
+          ['「そんな言い方しなくてもよくないですか？」と言い返す',()=>{recordWarningIncident(p,'明確な拒否後に相手へ言い返す');S.rude+=2;story(p,P.name,'「……もう話しかけないでください」<br>相手の声で、近くにいた人たちがこちらを見る。<br><span class="thought">（終わった。断られたことより、“断った相手を責めた”ことの方が致命的だ。）</span>',[['その場を離れる',()=>endingBad('warning')]])}]
+        ]);
+      }],
+      ['何も言わず離れる',()=>show('map')]
+    ]);
+  };
+})();
+</script>
+
 </body></html>
