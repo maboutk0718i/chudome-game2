@@ -1609,4 +1609,96 @@ window.addEventListener('load',()=>{
 <script>
 /* === Ver6.37: 2周目の雪奈・りおを1周目と同じ衣装・同じ配置へ復帰 === */
 </script>
+
+<script>
+/* === 撮影後4択 + 撮影NG時RAW現像エンディング表示 === */
+(function(){
+  function activeShotNgCount(){
+    const places=['outdoor','indoor','rest','east','entrance'];
+    return [...(S.refused||[])].filter(p=>places.includes(p)&&!(S.shotDone&&S.shotDone.has(p))).length;
+  }
+
+  function rawEndingSvg(){
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101217"/><stop offset="1" stop-color="#252b35"/></linearGradient>
+        <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#34302d"/><stop offset="1" stop-color="#191716"/></linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <rect width="1200" height="760" fill="url(#bg)"/>
+      <rect y="600" width="1200" height="160" fill="url(#desk)"/>
+      <ellipse cx="600" cy="620" rx="420" ry="34" fill="#000" opacity=".36"/>
+      <rect x="210" y="85" width="780" height="505" rx="18" fill="#090b0f" stroke="#59616f" stroke-width="8"/>
+      <rect x="238" y="115" width="724" height="438" rx="4" fill="#1b2028"/>
+      <rect x="270" y="150" width="410" height="330" rx="4" fill="#11151b"/>
+      <rect x="292" y="175" width="366" height="280" fill="#6e7686" opacity=".23"/>
+      <circle cx="474" cy="298" r="82" fill="#d2d4db" opacity=".14"/>
+      <path d="M294 425 C360 380 428 398 493 368 C552 340 600 354 656 320 L656 455 L294 455Z" fill="#9da4b2" opacity=".12"/>
+      <rect x="710" y="150" width="215" height="130" rx="6" fill="#11151b"/>
+      <polyline points="726,248 746,226 766,234 788,205 808,214 830,177 850,212 875,190 904,235" fill="none" stroke="#d6dbe5" stroke-width="4"/>
+      <text x="722" y="175" font-family="Arial,sans-serif" font-size="18" fill="#d7dce5">HISTOGRAM</text>
+      <g font-family="Arial,sans-serif" fill="#c5cad3" font-size="18">
+        <text x="710" y="322">EXPOSURE</text><rect x="710" y="338" width="210" height="8" rx="4" fill="#424956"/><circle cx="826" cy="342" r="10" fill="#d8dde6"/>
+        <text x="710" y="382">COLOR TEMP</text><rect x="710" y="398" width="210" height="8" rx="4" fill="#424956"/><circle cx="795" cy="402" r="10" fill="#d8dde6"/>
+        <text x="710" y="442">SHADOWS</text><rect x="710" y="458" width="210" height="8" rx="4" fill="#424956"/><circle cx="850" cy="462" r="10" fill="#d8dde6"/>
+      </g>
+      <g transform="translate(270 500)"><rect width="78" height="38" rx="4" fill="#59616f"/><rect x="88" width="78" height="38" rx="4" fill="#727a88"/><rect x="176" width="78" height="38" rx="4" fill="#4b5360"/><rect x="264" width="78" height="38" rx="4" fill="#646d7a"/><rect x="352" width="78" height="38" rx="4" fill="#535b68"/></g>
+      <rect x="535" y="590" width="130" height="46" rx="4" fill="#090b0f"/><rect x="470" y="632" width="260" height="18" rx="9" fill="#0b0d10"/>
+      <text x="600" y="48" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" letter-spacing="6" fill="#bfc5d0">RAW DEVELOP</text>
+      <text x="600" y="708" text-anchor="middle" font-family="sans-serif" font-size="32" font-weight="700" fill="#f3f5f7" filter="url(#glow)">今日のRAWを現像中</text>
+      <text x="600" y="738" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#b8bec8">撮れなかった相手もいる。それでも、撮れた一枚を仕上げていく。</text>
+    </svg>`;
+    return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+  }
+
+  const _setEndPosterMode=setEndPosterMode;
+  setEndPosterMode=function(mode){ return _setEndPosterMode(mode); };
+
+  const _showEndPoster=showEndPoster;
+  showEndPoster=function(){
+    const ng=activeShotNgCount();
+    const current=endPosterMode;
+    if(ng>0 && current!=='bad'){
+      const ps=$('#posterScene'),img=$('#posterImg');
+      if(ps)ps.className='posterScene continue';
+      if(img){img.src=rawEndingSvg();img.alt='RAW現像中のエンディングアート';}
+      theme('field');show('postend');window.scrollTo({top:0,behavior:'auto'});
+      requestAnimationFrame(()=>requestAnimationFrame(()=>ps&&ps.classList.add('posterVisible')));
+      return;
+    }
+    return _showEndPoster();
+  };
+
+  function nextMeetChoice(p){
+    const local=(S.bond?.[p]||0)+(S.loop===2?(S.priorBond?.[p]||0)*.35:0)+Math.max(-2,Math.min(3,(S.trust-S.unease)/2));
+    if(local>=3){
+      S.rep++;S.trust++;S.bond[p]=(S.bond[p]||0)+1;
+      return finishPostShootChoice(p,'「はい、もちろんです。タイミング合ったらぜひ！」');
+    }
+    if(local>=0){
+      return finishPostShootChoice(p,'「はい、イベントでタイミング合えば大丈夫です」<br><span class="thought">（悪くない。ただ、まだ“次も当然”という距離ではない。）</span>');
+    }
+    S.unease++;
+    return finishPostShootChoice(p,'「あ、イベントによるかもです……」<br>少しだけ返事が曖昧になった。<br><span class="thought">（次の約束を取るには、まだ少し早かったか。）</span>');
+  }
+
+  postShootChoices=function(p,appeal){
+    const P=people[p];
+    const choices={
+      thanks:['「ありがとうございました。また機会があればお願いします」',()=>{S.rep++;S.trust++;S.bond[p]=(S.bond[p]||0)+1;finishPostShootChoice(p,'「はい、こちらこそありがとうございました！」')}],
+      photo:['「かなりいいの撮れました。あとで送りますね」',()=>{if(appeal>=80){S.rep++;S.trust++;finishPostShootChoice(p,'「ありがとうございます。楽しみにしてます！」')}else{S.unease++;finishPostShootChoice(p,'「あ、はい……確認しますね」<br>少しだけ反応が控えめだった。')}}],
+      creepy:['「撮ってる間、ずっと見ていたくなる感じでした」',()=>{S.creep++;S.unease+=2;S.bond[p]=Math.max(-3,(S.bond[p]||0)-1);finishPostShootChoice(p,'「……あ、ありがとうございます」<br>'+P.name+'は一瞬だけ返事に間を置いた。')}],
+      next:['「次も見かけたら声かけてもいいですか？」',()=>nextMeetChoice(p)]
+    };
+    const order={
+      outdoor:['photo','next','thanks','creepy'],
+      indoor:['next','thanks','creepy','photo'],
+      rest:['creepy','photo','thanks','next'],
+      east:['thanks','creepy','next','photo'],
+      entrance:['next','photo','creepy','thanks']
+    }[p]||['photo','next','thanks','creepy'];
+    return order.map(k=>choices[k]);
+  };
+})();
+</script>
 </body></html>
