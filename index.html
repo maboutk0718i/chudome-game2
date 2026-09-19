@@ -958,11 +958,33 @@ function loop2Landmine(p){
   }]
  ]);
 }
+const LOOP2_WARY_REPLIES={
+ outdoor:{
+  apology:'「……謝ってもらっても、撮影をお願いしたいとは思わないです」<br>雪奈は丁寧な口調のまま、友人の方へ視線を戻した。<br>「今日はもう、声かけなくて大丈夫です」<br><span class="thought">（“大丈夫”の意味は分かった。許されたんじゃない。会話を終わらせたいんだ。）</span>',
+  hello:'「……こんにちは」<br>雪奈は一度だけ会釈した。<br>「前回のこと覚えてるので、無理に挨拶しに来なくても大丈夫ですよ」<br><span class="thought">（挨拶すら“しなくていい”側に入った。これはもう足さない方がいい。）</span>'
+ },
+ indoor:{
+  apology:'「別に、謝らなくていいです」<br>りおはスマホから目を上げない。<br>「撮影はしないので。それだけです」<br><span class="thought">（短い。余白もない。これ以上しゃべったら全部ノイズだ。）</span>',
+  hello:'「……はい、こんにちは」<br>りおは一瞬だけこちらを見て、すぐスマホへ視線を戻した。<br>「用事、それだけですか？」<br><span class="thought">（会話終了の確認までされた。完全にスルーされる一歩手前だ。）</span>'
+ },
+ rest:{
+  apology:'「あの……謝られると、逆にちょっと困るので……」<br>みくは困ったように笑って、椅子を少し引いた。<br>「今日はもう大丈夫です。休ませてください」<br><span class="thought">（優しい言い方なのに、距離だけははっきり増えた。）</span>',
+  hello:'「……こんにちは」<br>みくは小さく返したあと、飲み物へ視線を落とした。<br>「ごめんなさい、今ちょっと一人で休みたいので……」<br><span class="thought">（挨拶だけのつもりでも、相手には“また来た”なんだ。）</span>'
+ },
+ east:{
+  apology:'「謝罪が欲しいわけじゃないです」<br>カレンは迷わず言った。<br>「前回お断りしたのは、今後も撮ってほしくないからです。そこは分かってください」<br><span class="thought">（言葉にされると逃げ道がない。これは完全に線を引かれた。）</span>',
+  hello:'「挨拶だけでも、こっちは対応しないといけないので」<br>カレンは表情を変えない。<br>「今日は声かけないでもらえますか？」<br><span class="thought">（“挨拶だけ”も相手にとってはゼロじゃない。分かってなかった。）</span>'
+ },
+ entrance:{
+  apology:'「前回、ちょっと怖かったので……」<br>あやは友人のそばへ半歩寄った。<br>「謝ってもらっても、今日はもう話しかけないでほしいです」<br><span class="thought">（友達の前で言わせた。ここに居続ける方がもっとまずい。）</span>',
+  hello:'「……こんにちは」<br>あやは短く返したが、すぐ友人の方を向いた。<br>「ごめんなさい。前回のこともあるし、もう大丈夫です」<br>友人もこちらを見ている。<br><span class="thought">（一対一じゃなくなった瞬間、居場所がなくなった。離れよう。）</span>'
+ }
+};
 function loop2WaryVisit(p){
- const P=people[p];
+ const P=people[p],R=LOOP2_WARY_REPLIES[p]||LOOP2_WARY_REPLIES.outdoor;
  story(p,P.name,LOOP2_WARY[p]+'<br><span class="thought">（覚えられてる。しかも悪い方で。今日は“撮る”より先に、“怖がらせない”が正解だ。）</span>',[
-  ['「前回はすみませんでした」と謝って離れる',()=>{S.backedOff++;S.rep++;S.bond[p]+=1;show('map')}],
-  ['今日は撮影を頼まず、挨拶だけする',()=>{S.backedOff++;S.trust++;show('map')}],
+  ['「前回はすみませんでした」と謝って離れる',()=>{S.backedOff++;S.unease++;refuse(p);story(p,P.name,R.apology,[['何も足さず離れる',()=>show('map')]])}],
+  ['今日は撮影を頼まず、挨拶だけする',()=>{S.backedOff++;S.unease++;refuse(p);story(p,P.name,R.hello,[['そのまま離れる',()=>show('map')]])}],
   ['「今回は大丈夫なので」と撮影をお願いする',()=>{S.unease+=3;refuse(p);story(p,P.name,'「……そういう意味じゃなくて、今日は撮影しません」<br>相手ははっきり言い直した。<br><span class="thought">（“今回は大丈夫”を決めるのは俺じゃない。）</span>',[['すぐ引く',()=>{S.backedOff++;show('map')}],['もう一度だけ頼む',()=>{recordWarningIncident(p,'1周目NGの相手へ2周目でも拒否後に再依頼');endingBad('warning')} ]])}],
   ['何も言わず離れる',()=>show('map')]
  ]);
