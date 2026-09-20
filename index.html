@@ -478,7 +478,7 @@
 
 <section id="loading" class="screen active"><div class="loadingInner"><div class="loadingText">NOW LOADING...</div><div class="loadingSub">CHUDOME GAME DATA</div></div></section>
 <section id="pretitle" class="screen"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.33</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.34</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -1723,7 +1723,7 @@ window.addEventListener('load',()=>{
 </script>
 
 <script>
-/* === Ver6.33 patch: 評判下位ランク / りお質感会話 / 2周目再拒否分岐 === */
+/* === Ver6.34 patch: 評判下位ランク / りお質感会話 / 2周目再拒否分岐 === */
 (function(){
   const BASE_LAYER_REP_LABELS=['無名','顔を覚えられ始めた','少し知られている','好印象','評判が良い','信頼されている','人気カメコ'];
 
@@ -1973,6 +1973,104 @@ window.addEventListener('load',()=>{
       ['マップへ戻る',()=>show('map')]
     ]);
   };
+})();
+</script>
+
+
+<script>
+/* === Ver.6.34 patch: NG即要警戒 / BAD悪評を2周目へ噂として継承 === */
+(function(){
+  const LAYER_PLACES=['outdoor','indoor','rest','east','entrance'];
+  function activeNgCount(){
+    return [...(S.refused||[])].filter(p=>LAYER_PLACES.includes(p)&&!(S.shotDone&&S.shotDone.has(p))).length;
+  }
+  function rumorLevel(){ return Number(S.priorRumorLevel||0); }
+
+  /* 一度でも撮影NGなら、評価が高くても最低「要警戒カメコ」。
+     警告級・重度リスク、または重いBADの噂がある場合はブラックリスト級。 */
+  const _layerRepName_rumor=layerRepName;
+  layerRepName=function(){
+    if(typeof isGodKameko==='function' && isGodKameko() && activeNgCount()===0 && rumorLevel()===0) return '神カメコ';
+    const ng=activeNgCount();
+    const warnings=(S.warningIncidents||[]).length;
+    const pressures=(S.pressureLog||[]).length;
+    const severeNow=warnings>0 || S.creep>=4 || S.rude>=4 || pressures>=2;
+    if(rumorLevel()>=2 || severeNow) return 'ブラックリスト級カメコ';
+    if(rumorLevel()>=1 || ng>=1) return '要警戒カメコ';
+    return _layerRepName_rumor.apply(this,arguments);
+  };
+
+  /* BADの重さを、2周目へ持ち越すため記録。
+     distance=軽いBAD、それ以外のBADは界隈へ広がる重いBAD扱い。 */
+  const _endingBad_rumor=endingBad;
+  endingBad=function(type){
+    S._badCarrySeverity=(type==='distance')?1:2;
+    S._badCarryType=type||'social';
+    return _endingBad_rumor.apply(this,arguments);
+  };
+
+  /* 2周目開始時に1周目のNG/BADを「噂」として全体評判へ反映。 */
+  const _startSecondLoop_rumor=startSecondLoop;
+  startSecondLoop=function(){
+    const priorNg=[...(S.refused||[])].filter(p=>LAYER_PLACES.includes(p)).length;
+    const badSeverity=Number(S._badCarrySeverity||0);
+    const carry=Math.max(priorNg>0?1:0,badSeverity);
+    const priorBondSnapshot={...(S.bond||{})};
+    const priorBadType=S._badCarryType||'';
+    const r=_startSecondLoop_rumor.apply(this,arguments);
+    S.priorRumorLevel=carry;
+    S.priorBadType=priorBadType;
+    S.priorBond={...S.priorBond,...priorBondSnapshot};
+    if(carry>=2){
+      S.rep=Math.min(S.rep,-5);S.trust=Math.min(S.trust,0);S.unease=Math.max(S.unease,5);
+    }else if(carry===1){
+      S.rep=Math.min(S.rep,-2);S.unease=Math.max(S.unease,3);
+    }
+    try{v2Status();}catch(e){}
+    return r;
+  };
+
+  /* 2周目では、前回好印象だった相手にも噂が届いている。
+     個別好感度は残しつつ、悪評が上から被さる会話にする。 */
+  const _loop2RepGreeting_rumor=loop2RepGreeting;
+  loop2RepGreeting=function(p){
+    const lv=rumorLevel();
+    if(!lv) return _loop2RepGreeting_rumor.apply(this,arguments);
+    const P=people[p], bond=Number(S.priorBond?.[p]||0);
+    const liked=bond>=2;
+    const veryLiked=bond>=4;
+    const light={
+      outdoor: liked?'「前回の写真、よかったんですけど……ちょっと色々聞いてて」<br>雪奈は笑おうとしたが、以前より一歩ぶん距離を取っている。':'「……前回のこと、少し聞いてます」<br>雪奈の返事は丁寧だが、警戒が混じっている。',
+      indoor: liked?'「写真はよかったです。でも、前回のことで少し話を聞いてます」<br>りおは淡々とこちらを見る。':'「……前回、ちょっと色々あったって聞いてます」<br>りおはスマホを下ろさずに答えた。',
+      rest: liked?'「この前の写真は嬉しかったんですけど……ちょっと噂を聞いてて」<br>みくは申し訳なさそうにしながらも、距離を保っている。':'「あの……前回のこと、少し聞いてます」<br>みくは友人の方を一度確認した。',
+      east: liked?'「前回の写真自体は悪くなかったです。ただ、別の話も聞いてます」<br>カレンは好意と警戒をきっぱり分けている。':'「前回の件、少し耳に入ってます」<br>カレンは表情を変えず、こちらを警戒している。',
+      entrance: liked?'「前の写真は好きだったんですけど……友達から少し聞いてて」<br>あやは友人のそばを離れない。':'「……前回のこと、友達から聞いてます」<br>あやは友人の方へ半歩寄った。'
+    };
+    const heavy={
+      outdoor: veryLiked?'「前回の写真は本当に好きでした。でも……注意喚起の話、見ました」<br>雪奈は苦しそうに言って、はっきり距離を取った。':'「……すみません。噂、かなり回ってます。今日は近づかないでもらえますか」<br>雪奈は友人の方へ体を向けた。',
+      indoor: veryLiked?'「写真がよかったことと、今聞いてる話は別です」<br>りおは目を合わせたまま、静かに線を引いた。':'「名前、聞いてます。今日は話しかけないでください」<br>りおの声は低く、迷いがない。',
+      rest: veryLiked?'「前は安心して撮ってもらえたと思ってたんですけど……噂を見て、ちょっと怖いです」<br>みくは明確に距離を取った。':'「ごめんなさい……名前、共有されてます」<br>みくは友人の後ろへ下がった。',
+      east: veryLiked?'「前回の写真への評価と、今回の警戒は別です。噂を無視するつもりはありません」<br>カレンははっきり言い切った。':'「注意喚起、見ました。撮影以前に今日は関わらないでください」<br>カレンは迷わず拒絶した。',
+      entrance: veryLiked?'「前の写真は嬉しかったです。でも、今は友達にも止められてます」<br>あやは友人のそばから動かなかった。':'「……名前、回ってます。友達もいるので、もう話しかけないでください」<br>あやは友人の後ろへ半歩下がった。'
+    };
+    const rank=lv>=2?'ブラックリスト級カメコ':'要警戒カメコ';
+    return (lv>=2?heavy[p]:light[p])+`<br><span class="thought">（レイヤー評判：${rank}。前回の行動が、本人との関係を越えて噂として広まっている。）</span>`;
+  };
+
+  /* 重い噂の状態では、前回好印象でも撮影依頼は通らない。
+     軽い噂は既存の要警戒処理に任せる。 */
+  const _loop2ShootOffer_rumor=loop2ShootOffer;
+  loop2ShootOffer=function(p){
+    if(rumorLevel()>=2){
+      const P=people[p];refuse(p);
+      story(p,P.name,'「……撮影は無理です。前回のこと、もう私だけの話じゃないので」<br><span class="thought">（前回ここで好印象だったとしても、広がった噂は別のところから入ってくる。）</span>',[
+        ['「わかりました」と離れる',()=>{S.backedOff++;show('map')}]
+      ]);return;
+    }
+    return _loop2ShootOffer_rumor.apply(this,arguments);
+  };
+
+  try{v2Status();}catch(e){}
 })();
 </script>
 
