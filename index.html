@@ -2495,4 +2495,94 @@ window.addEventListener('load',()=>{
 })();
 </script>
 
+<script>
+/* === Ver.6.40 patch: 2周目・当日撮影NG後の再訪も個別化 === */
+(function(){
+  const LOOP2_REJECTED_REVISIT_V640={
+    outdoor:{
+      line:'雪奈は友人のそばへ戻り、次の撮影場所を相談している。<br>マボに気づくと、笑顔を作らずに短く言った。<br>「今日はもう撮影しません」<br><span class="thought">（二周目でも、一度出た答えは変わらない。ここから先は“撮影交渉”ではなく“食い下がり”だ。）</span>',
+      apologyLabel:'「さっきはすみませんでした」と謝る',
+      apology:'「……はい。もう大丈夫です」<br>雪奈は返事だけして、友人の方へ向き直った。<br><span class="thought">（謝罪のためでも、また近づいた事実は消えない。）</span>',
+      pressureLabel:'「一枚だけでもだめですか？」ともう一度頼む',
+      pressure:'雪奈は友人の後ろへ下がった。<br>「さっき断りましたよね。もう声を掛けないでください」',
+      funnyLabel:'友人を探しているふりをして方向転換する',
+      funny:'マボは誰かを見つけたように小さく手を上げ、そのまま反対方向へ歩いた。<br><span class="thought">（手を上げた先には誰もいない。だが、振り返らなければ成立する。たぶん。）</span>'
+    },
+    indoor:{
+      line:'りおは壁際でスマホを見ていたが、近づくマボに気づいて画面を下げた。<br>「今日はもう撮影しません」<br><span class="thought">（確認ではない。会話を終わらせるための再通告だ。）</span>',
+      apologyLabel:'「わかりました。すみません」と謝る',
+      apology:'「はい」<br>りおの返事は一言だけだった。<br><span class="thought">（短い返事に、会話を続ける余白はない。）</span>',
+      pressureLabel:'「理由だけ聞いてもいいですか？」と尋ねる',
+      pressure:'「答える必要ありますか？」<br>りおはスマホを持ち直し、はっきり距離を取った。',
+      funnyLabel:'レンズキャップを落としたふりをして引き返す',
+      funny:'マボは足元を二度確認し、何も拾わずに来た道を戻った。<br><span class="thought">（レンズキャップはポケットに入っている。最初から知っている。）</span>'
+    },
+    rest:{
+      line:'みくは休憩スペースで友人と話している。マボを見ると、困ったように眉を下げた。<br>「今日はもう撮影しません」<br><span class="thought">（優しい言い方でも、答えは変わらない。優しさを交渉の余地と勘違いするな。）</span>',
+      apologyLabel:'「何度もすみません」と謝る',
+      apology:'「あの……もう気にしなくていいので、そっとしておいてください」<br>みくは友人のそばへ椅子を寄せた。<br><span class="thought">（謝る回数が増えるほど、話しかけた回数も増えている。）</span>',
+      pressureLabel:'「休憩が終わってからならどうですか？」と聞く',
+      pressure:'「休憩の問題じゃないです」<br>みくは笑わず、首を横に振った。',
+      funnyLabel:'飲み物を買い忘れた顔で急に引き返す',
+      funny:'マボはポケットを探り、思い出したように踵を返した。<br><span class="thought">（買い忘れたものはない。むしろ両手に一本ずつ飲み物を持っている。）</span>'
+    },
+    east:{
+      line:'カレンは東側の背景を確認していたが、マボが近づく前に振り向いた。<br>「今日はもう撮影しません」<br><span class="thought">（先に言わせた時点で、こちらの接近そのものが警戒されている。）</span>',
+      apologyLabel:'「先ほどは失礼しました」と謝る',
+      apology:'「謝罪は受け取りました。これ以上は必要ありません」<br>カレンはそこで会話を切った。<br><span class="thought">（許されたのではない。終了を宣言された。）</span>',
+      pressureLabel:'「条件を変えれば撮れますか？」と交渉する',
+      pressure:'「条件の話ではありません」<br>カレンは一歩も引かずに言った。<br>「撮影しないと言っています」',
+      funnyLabel:'床のテープ位置を確認するふりで通り過ぎる',
+      funny:'マボは床の養生テープを現場監督のように見つめながら通り過ぎた。<br><span class="thought">（俺はスタッフではない。テープにも何の異常もない。）</span>'
+    },
+    entrance:{
+      line:'あやは入口で友人と合流していた。マボを見ると、友人の隣から動かずに答えた。<br>「今日はもう撮影しません」<br><span class="thought">（一人ではない今、もう一度頼むことの圧はさらに強くなる。）</span>',
+      apologyLabel:'あやと友人に「すみませんでした」と謝る',
+      apology:'「……はい」<br>あやは短く答えた。友人は何も言わず、こちらを見ている。<br><span class="thought">（二人に対応させた。謝罪でも、相手の時間をまた使わせている。）</span>',
+      pressureLabel:'「お友達も一緒なら撮りませんか？」と提案する',
+      pressure:'「そういう意味じゃないです」<br>あやの友人が一歩前へ出た。<br>「もう声を掛けないでもらえますか」',
+      funnyLabel:'到着連絡が来たふりをして入口の外へ向かう',
+      funny:'マボは通知のないスマホにうなずき、入口の外へ歩き出した。<br><span class="thought">（誰も来ていない。でも退場の理由としては十分だ。）</span>'
+    }
+  };
+
+  function loop2RejectedRevisitV640(p){
+    const P=people[p];
+    const R=LOOP2_REJECTED_REVISIT_V640[p]||LOOP2_REJECTED_REVISIT_V640.outdoor;
+    story(p,P.name,R.line,[
+      [R.apologyLabel,()=>{
+        S.unease++;
+        story(p,P.name,R.apology,[['何も足さず離れる',()=>{S.backedOff++;show('map')}]]);
+      }],
+      ['静かにその場を離れる',()=>{
+        S.backedOff++;
+        story(p,'マボ','マボは声を掛けず、相手から十分に距離を取った。<br><span class="thought">（答えはもう出ている。何も足さないことが、今できる唯一の正解だ。）</span>',[
+          ['会場マップへ戻る',()=>show('map')]
+        ]);
+      }],
+      [R.pressureLabel,()=>{
+        recordWarningIncident(p,'2周目で当日撮影NG後に再接触し、もう一度撮影を求めた');
+        S.creep++;
+        story(p,P.name,R.pressure,[['それでも食い下がる',()=>endingBad('warning')],['ようやく離れる',()=>{S.backedOff++;show('map')} ]]);
+      }],
+      [R.funnyLabel,()=>{
+        story(p,'マボ',R.funny,[['そのままマップへ戻る',()=>show('map')]],P.img);
+      }]
+    ]);
+  }
+
+  const _visitLoop2_v640=visitLoop2;
+  visitLoop2=function(p){
+    if(p!=='rivals' && S.refused&&S.refused.has(p)){
+      loop2RejectedRevisitV640(p);
+      return;
+    }
+    return _visitLoop2_v640.apply(this,arguments);
+  };
+
+  const versionEl=document.querySelector('.titleVersion');
+  if(versionEl) versionEl.textContent='Ver. 6.40';
+})();
+</script>
+
 </body></html>
