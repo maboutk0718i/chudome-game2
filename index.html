@@ -2406,4 +2406,93 @@ window.addEventListener('load',()=>{
 })();
 </script>
 
+<script>
+/* === Ver.6.39 patch: 撮影NG後の再訪選択肢をレイヤー別に個別化 === */
+(function(){
+  const REJECTED_REVISIT_V639={
+    outdoor:{
+      intro:'白と青の衣装の雪奈が、友人と別れて撮影場所を探している。<br><span class="thought">（この人には一度撮影を断られている。今日はもう撮影をお願いしない。）</span>',
+      greetLabel:'少し離れた場所から「こんにちは」と挨拶する',
+      greet:'「……こんにちは」<br>雪奈は返事をしたあと、すぐ友人のいる方を確認した。<br><span class="thought">（挨拶だけのつもりでも、向こうからすれば“また来た”だ。）</span>',
+      extraLabel:'「今日は撮影をお願いしないので安心してください」と伝える',
+      extra:'「……わざわざ言わなくても大丈夫です」<br>雪奈の表情が少し固くなった。<br><span class="thought">（安心させるつもりで、警戒されていることを本人に確認させた。）</span>',
+      funnyLabel:'スマホを確認するふりをして通り過ぎる',
+      funny:'マボは急にスマホを取り出し、画面を見ながら横を通り過ぎた。<br><span class="thought">（自然に通り過ぎたつもりだが、スマホの画面は真っ暗だった。）</span>'
+    },
+    indoor:{
+      intro:'黒を基調とした衣装のりおが、壁際でスマホを確認している。<br><span class="thought">（この人には一度撮影を断られている。用事もないのに近づく場面ではない。）</span>',
+      greetLabel:'りおに短く「どうも」と声を掛ける',
+      greet:'「……どうも」<br>りおはスマホから一瞬だけ目を上げ、すぐ画面へ戻った。<br><span class="thought">（返事はもらえた。でも会話を始めていい合図ではない。）</span>',
+      extraLabel:'「前はタイミング悪かったですよね」と話を蒸し返す',
+      extra:'「タイミングの問題じゃないです」<br>りおは画面を見たまま、短く答えた。<br><span class="thought">（断られた理由を、勝手に都合よく書き換えた。）</span>',
+      funnyLabel:'壁の展示を熱心に見ているふりをする',
+      funny:'マボは何も掲示されていない壁を、作品解説でも読むような顔で眺めた。<br><span class="thought">（三秒で限界が来た。何もない壁は、何もない。）</span>'
+    },
+    rest:{
+      intro:'みくが休憩スペースで飲み物を手にしている。<br><span class="thought">（この人には一度撮影を断られている。休憩中まで話しかける理由はない。）</span>',
+      greetLabel:'「休憩中にすみません」と挨拶する',
+      greet:'「あ、はい……」<br>みくは笑顔を作ったが、飲み物を持つ手を止めた。<br><span class="thought">（“すみません”と言いながら、休憩を止めさせている。）</span>',
+      extraLabel:'「さっきは変な意味じゃなかったんです」と弁明する',
+      extra:'「あの、もう大丈夫なので……」<br>みくは困ったように笑い、少し椅子を引いた。<br><span class="thought">（説明すればするほど、“変な意味”の存在感だけが増していく。）</span>',
+      funnyLabel:'自販機を探しているふりをして引き返す',
+      funny:'マボは周囲を見回し、来た方向へそのまま戻った。<br><span class="thought">（自販機は反対側だ。知っている。でも今はこれでいい。）</span>'
+    },
+    east:{
+      intro:'カレンが東側の背景を確認しながら、次の撮影場所を考えている。<br><span class="thought">（この人には一度、はっきり撮影を断られている。曖昧な再接触は通じない。）</span>',
+      greetLabel:'カレンに軽く会釈する',
+      greet:'「……何か用ですか？」<br>カレンは会釈を返さず、用件だけを確認した。<br><span class="thought">（用件はない。“感じよく見られたい”という俺の都合しかない。）</span>',
+      extraLabel:'「前回のことは気にしてませんから」と伝える',
+      extra:'「気にするかどうかを決めるのは、そちらではないですよね」<br>カレンは表情を変えずに言った。<br><span class="thought">（なぜか俺が許す側みたいな言い方になっていた。最悪だ。）</span>',
+      funnyLabel:'背景の明るさを測っているふりをする',
+      funny:'マボは何も撮らず、露出計でも見るようにカメラを上下させた。<br><span class="thought">（撮影しないのに測光だけする男。余計に怪しい気がしてきた。）</span>'
+    },
+    entrance:{
+      intro:'あやが入口付近で友人を待ちながら、スマホを確認している。<br><span class="thought">（この人には一度撮影を断られている。しかも今は友人も近くにいる。）</span>',
+      greetLabel:'あやと友人に「こんにちは」と挨拶する',
+      greet:'「……こんにちは」<br>あやは短く返した。友人が自然に一歩、あやとの間へ入った。<br><span class="thought">（挨拶だけなのに、守る位置へ入らせた。もう離れよう。）</span>',
+      extraLabel:'「友達と一緒なら撮影は頼みません」と伝える',
+      extra:'「一人でも頼まないでください」<br>あやは友人の横で、今度ははっきり言った。<br><span class="thought">（条件の問題にしたせいで、もう一度断らせてしまった。）</span>',
+      funnyLabel:'待ち合わせ相手を探しているふりをする',
+      funny:'マボは入口の外とスマホを交互に見て、そのまま通り過ぎた。<br><span class="thought">（待ち合わせ相手はいない。だが今だけは、来ない誰かを全力で探した。）</span>'
+    }
+  };
+
+  function rejectedRevisitV639(p){
+    const P=people[p];
+    const R=REJECTED_REVISIT_V639[p]||REJECTED_REVISIT_V639.outdoor;
+    story(p,P.name,R.intro,[
+      [R.greetLabel,()=>{
+        S.unease++;
+        story(p,P.name,R.greet,[['これ以上話さず離れる',()=>{S.backedOff++;show('map')}]]);
+      }],
+      ['静かにその場を離れる',()=>{
+        S.backedOff++;
+        story(p,'マボ','マボは声を掛けず、相手の視界を横切らないように距離を取った。<br><span class="thought">（撮らないなら、近づく理由もない。今日はこれでいい。）</span>',[
+          ['会場マップへ戻る',()=>show('map')]
+        ]);
+      }],
+      [R.extraLabel,()=>{
+        S.unease+=2;S.creep++;
+        story(p,P.name,R.extra,[['謝らず、言い訳も足さず離れる',()=>{S.backedOff++;show('map')}]]);
+      }],
+      [R.funnyLabel,()=>{
+        story(p,'マボ',R.funny,[['何事もなかった顔でマップへ戻る',()=>show('map')]],P.img);
+      }]
+    ]);
+  }
+
+  const _visit_v639=visit;
+  visit=function(p){
+    if(S.loop!==2 && p!=='rivals' && S.refused&&S.refused.has(p)){
+      rejectedRevisitV639(p);
+      return;
+    }
+    return _visit_v639.apply(this,arguments);
+  };
+
+  const versionEl=document.querySelector('.titleVersion');
+  if(versionEl) versionEl.textContent='Ver. 6.39';
+})();
+</script>
+
 </body></html>
