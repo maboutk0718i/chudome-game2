@@ -2318,4 +2318,92 @@ window.addEventListener('load',()=>{
 })();
 </script>
 
+<script>
+/* === Ver.6.38 patch: レイヤー評判を段階的に低下 === */
+(function(){
+  const LAYER_PLACES_V638=['outdoor','indoor','rest','east','entrance'];
+  const NORMAL_LAYER_LABELS_V638=['無名','顔を覚えられ始めた','少し知られている','好印象','評判が良い','信頼されている','人気カメコ'];
+
+  function activeNgV638(){
+    return [...(S.refused||[])].filter(p=>LAYER_PLACES_V638.includes(p)&&!(S.shotDone&&S.shotDone.has(p))).length;
+  }
+
+  /* 1周目の悪評も原則一段ずつ持ち越す。
+     反復した重度行為だけをブラックリスト級の噂として残す。 */
+  const _startSecondLoop_v638=startSecondLoop;
+  startSecondLoop=function(){
+    const warnings=(S.warningIncidents||[]).length;
+    const pressures=(S.pressureLog||[]).length;
+    const creep=Number(S.creep||0);
+    const rude=Number(S.rude||0);
+    const extremePrior=
+      warnings>=3 ||
+      (warnings>=2 && (pressures>=2 || creep>=6 || rude>=6)) ||
+      pressures>=4 ||
+      creep>=9 ||
+      rude>=9;
+    const result=_startSecondLoop_v638.apply(this,arguments);
+    const carried=Number(S.priorLayerRumorLevel||S.priorRumorLevel||0);
+    const adjusted=extremePrior?3:(carried>0?1:0);
+    S.priorLayerRumorLevel=adjusted;
+    S.priorRumorLevel=adjusted;
+    try{v2Status()}catch(e){}
+    return result;
+  };
+
+  /*
+   * 軽い失敗は「微妙」、失敗の反復や一度の明確な警告行為は「要警戒」。
+   * ブラックリスト級は、明確な警告行為の反復や複数の重度行為が
+   * 重なった場合だけに限定する。
+   */
+  layerRepName=function(){
+    if(typeof isGodKameko==='function' && isGodKameko()) return '神カメコ';
+
+    const ng=activeNgV638();
+    const warnings=(S.warningIncidents||[]).length;
+    const pressures=(S.pressureLog||[]).length;
+    const creep=Number(S.creep||0);
+    const rude=Number(S.rude||0);
+    const unease=Number(S.unease||0);
+    const layerRumor=Number(S.priorLayerRumorLevel||S.priorRumorLevel||0);
+    const camRumor=Number(S.priorCamRumorLevel||0);
+
+    const extreme=
+      layerRumor>=3 ||
+      warnings>=3 ||
+      (warnings>=2 && (pressures>=2 || creep>=6 || rude>=6)) ||
+      pressures>=4 ||
+      creep>=9 ||
+      rude>=9 ||
+      (layerRumor>=2 && warnings>=1 && pressures>=2);
+    if(extreme) return 'ブラックリスト級カメコ';
+
+    const caution=
+      warnings>=1 ||
+      pressures>=2 ||
+      ng>=2 ||
+      layerRumor>=1 ||
+      camRumor>=1 ||
+      creep>=5 ||
+      rude>=5 ||
+      unease>=7;
+    if(caution) return '要警戒カメコ';
+
+    const doubtful=
+      ng>=1 ||
+      pressures>=1 ||
+      creep>=2 ||
+      rude>=2 ||
+      unease>=4;
+    if(doubtful) return '微妙なカメコ';
+
+    return NORMAL_LAYER_LABELS_V638[layerRepTier()];
+  };
+
+  const versionEl=document.querySelector('.titleVersion');
+  if(versionEl) versionEl.textContent='Ver. 6.38';
+  try{v2Status()}catch(e){}
+})();
+</script>
+
 </body></html>
