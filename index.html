@@ -478,7 +478,7 @@
 
 <section id="loading" class="screen active"><div class="loadingInner"><div class="loadingText">NOW LOADING...</div><div class="loadingSub">CHUDOME GAME DATA</div></div></section>
 <section id="pretitle" class="screen"><div class="pretitleInner"><button id="preludeStart" type="button">タップして開始</button><div id="preludeText" aria-live="polite"></div></div></section>
-<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.35</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
+<section id="title" class="screen"><div class="hero" id="titleTap"><img src="poses/embedded_dd1dcf349d9b5ec1.png"><div class="titleBrand">MABOX<small>presents</small></div><div class="titleVersion">Ver. 6.36</div><div class="titleLogo"><small>COSPLAY PHOTOGRAPHER ADVENTURE</small><h1>ちゅどーむに消ゆ</h1><small>― 野良カメコ・マボの一日 ―</small></div><button class="press" id="press">タップしてスタート</button><div class="fictionNote">本作品はフィクションです。登場する人物・団体・イベントおよび出来事は架空のものであり、実在のものとは関係ありません</div><div class="maker"><span class="mMark">M</span>MABOX<br><small>© 2026 MABOX</small></div></div></section>
 <section id="intro" class="screen"><div class="top"><b>PROLOGUE</b><span>09:18</span></div><div class="art"><img src="poses/embedded_2fe3d4ea4c6bcb65.jpg"></div><div class="intro"><h2>ちゅどーむ、到着。</h2><div id="introText">札幌のコスプレイベント。<br>野良のコスプレカメラマン、マボは今日も一人で会場へ来た。<br><br><span class="thought">（今日こそ……「また撮ってください」って言われる写真を撮る。できればSNSにも載せてもらう。いや、まず普通に会話を成立させろ俺。）</span><br><br>会場には、レイヤーとカメラマン、それぞれの思惑が渦巻いている。<br>何気ない一言が、数時間後の評判を変えることもある。</div></div><div class="next"><button class="cmd" id="toMap">▶ 会場へ入る</button></div></section>
 <section class="screen" id="map">
   <div class="panel">
@@ -2079,5 +2079,99 @@ window.addEventListener('load',()=>{
   try{v2Status();}catch(e){}
 })();
 </script>
+
+<script>
+/* === Ver.6.36 patch: 撮影後セルフ採点 + GOD END到達/未到達演出 === */
+(function(){
+  function maboSelfScoreThought(score){
+    const n=Math.max(0,Math.min(99,Number(score)||0));
+    let pool;
+    if(n>=90){
+      pool=[
+        `（${n}点くらいあるだろこれ……いや待て、俺の中の俺が盛ってるだけかもしれん。でも好き。かなり好き。）`,
+        `（${n}点。これは強い。帰って等倍で見て「思ってたんと違う」になりませんように……頼むぞ俺のピント。）`,
+        `（${n}点くらい。これSNSに載ったら何回も見に行くやつだな俺……自分で撮った写真を巡回するおじさん、普通にキモい。）`
+      ];
+    }else if(n>=80){
+      pool=[
+        `（${n}点くらい。悪くない。むしろ俺にしてはかなり良い。帰宅後に急に粗が見え始める現象だけは来るな。）`,
+        `（${n}点。お、ちゃんと撮れてるじゃん俺。……いや自分で自分を褒め始めたら終わりか？ でもちょっと嬉しい。）`,
+        `（${n}点くらいかな。載せてもらえたら嬉しい。通知来てないのに何回もSNS更新する未来まで見える。キモ。）`
+      ];
+    }else if(n>=70){
+      pool=[
+        `（${n}点くらいかな……撮れた瞬間は神だった気がしたんだけど、今見ると普通だな。俺の脳内補正、仕事しすぎ。）`,
+        `（${n}点。悪くはない。悪くはないんだが、“俺これ好きです！”って胸張るにはあと何か足りない。）`,
+        `（${n}点くらい。本人が気に入ってくれたら勝ち……って、それを言い訳にして技術点から逃げるな俺。）`
+      ];
+    }else if(n>=60){
+      pool=[
+        `（${n}点。うん、“撮れました”の範囲。作品ですって顔して出すほどではない。顔は平静、心は反省会。）`,
+        `（${n}点くらい……構図をいじってる時はもっとイケてた気がするんだけどな。ファインダーの中の俺、信用ならん。）`,
+        `（${n}点。送るのちょっと緊張するな。既読ついたあと無反応だったら三日は引きずる自信ある。）`
+      ];
+    }else{
+      pool=[
+        `（${n}点……。いや、撮った瞬間はもっと良く見えたんだよ。ファインダーの中では輝いてたんだよ……。）`,
+        `（${n}点くらい。これは帰ってRAWを開いてから俺とAdobeの長い戦いが始まるやつだ。）`,
+        `（${n}点……本人に渡す一枚として選んだ俺を信じたい。でも今もう別の写真にすればよかった気もしてる。遅い。）`
+      ];
+    }
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  const _finishPostShootChoice_v636=finishPostShootChoice;
+  finishPostShootChoice=function(p,line){
+    const P=people[p];
+    const score=S.photoScores[p]||S.photo||0;
+    const self=maboSelfScoreThought(score);
+    story(p,P.name,line+
+      '<br><span class="thought">（写真の出来だけじゃなく、最後の一言も印象に残る。）</span>'+
+      '<br><span class="thought selfScoreThought">'+self+'</span>',
+      [['一礼して離れる',()=>v4ReturnMap()]]
+    );
+  };
+
+  function appendFinalEndingTeaser(){
+    try{
+      if(!S || S.loop!==2) return;
+      const body=$('#endBody');
+      const title=$('#endTitle');
+      if(!body||!title||body.querySelector('.finalEndingTeaser')) return;
+      const god=/TRUE END\s*神カメコ/.test(title.textContent||'') || endPosterMode==='god';
+      const box=document.createElement('div');
+      box.className='finalEndingTeaser '+(god?'godComplete':'godLocked');
+      if(god){
+        box.innerHTML=`<div class="endChapter">――そして、最後の一枚が残った。</div>
+          <div class="endText">誰かに頼まれて撮るだけじゃない。<br>名前を覚えられ、写真を待たれ、次の撮影を頼まれる。<br><br>マボは、ついにここまで来た。</div>
+          <div class="endImpact"><b>GOD END COMPLETE</b><br><strong>神カメコ</strong></div>`;
+      }else{
+        box.innerHTML=`<div class="endChapter">――まだ、誰も見たことのない一枚がある。</div>
+          <div class="endText">すべての出会いが、最高の形でつながった時。<br>マボのカメコ人生は、もう一つ先へ進む。</div>
+          <div class="endImpact"><b>SPECIAL ENDING 未到達</b></div>`;
+      }
+      body.appendChild(box);
+    }catch(e){console.error(e)}
+  }
+
+  const _v2Finalize_v636=v2Finalize;
+  v2Finalize=function(){
+    const r=_v2Finalize_v636.apply(this,arguments);
+    appendFinalEndingTeaser();
+    return r;
+  };
+
+  const teaserObserver=new MutationObserver(()=>{
+    if($('#end')?.classList.contains('active')) setTimeout(appendFinalEndingTeaser,0);
+  });
+  if($('#endBody')) teaserObserver.observe($('#endBody'),{childList:true,subtree:false});
+})();
+</script>
+<style>
+.finalEndingTeaser{margin:28px 0 8px;padding:22px 18px;border-top:1px solid rgba(255,255,255,.22);text-align:center}
+.finalEndingTeaser .endChapter{letter-spacing:.04em}
+.finalEndingTeaser .endImpact{margin-top:18px;font-size:1.08em;letter-spacing:.08em}
+.finalEndingTeaser.godComplete .endImpact b,.finalEndingTeaser.godComplete .endImpact strong{font-weight:900}
+</style>
 
 </body></html>
