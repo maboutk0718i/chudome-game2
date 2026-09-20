@@ -2174,4 +2174,148 @@ window.addEventListener('load',()=>{
 .finalEndingTeaser.godComplete .endImpact b,.finalEndingTeaser.godComplete .endImpact strong{font-weight:900}
 </style>
 
+<script>
+/* === Ver.6.37 patch: カメコ評判とレイヤー評判を分離 === */
+(function(){
+  const LAYER_PLACES_V637=['outdoor','indoor','rest','east','entrance'];
+
+  function layerRumorLevelV637(){
+    return Number(S.priorLayerRumorLevel||0);
+  }
+  function cameraRumorLevelV637(){
+    return Number(S.priorCamRumorLevel||0);
+  }
+
+  /* BADの発生源を分離する。cameraはカメコ界隈、その他はレイヤー側の噂。 */
+  const _endingBad_v637=endingBad;
+  endingBad=function(type){
+    S._badCarryDomain=(type==='camera')?'camera':'layer';
+    return _endingBad_v637.apply(this,arguments);
+  };
+
+  /* 2周目へ、レイヤー側の噂とカメコ側の噂を別々に持ち越す。 */
+  const _startSecondLoop_v637=startSecondLoop;
+  startSecondLoop=function(){
+    const priorRep=Number(S.rep||0);
+    const priorTrust=Number(S.trust||0);
+    const priorUnease=Number(S.unease||0);
+    const priorCamRep=Number(S.camRep||0);
+    const priorCamHostile=!!S.camHostile;
+    const priorNg=[...(S.refused||[])].filter(p=>LAYER_PLACES_V637.includes(p)).length;
+    const priorScores={...(S.photoScores||{})};
+    const badSeverity=Number(S._badCarrySeverity||0);
+    const badType=S._badCarryType||'';
+    const badDomain=S._badCarryDomain||(badType==='camera'?'camera':'layer');
+
+    const layerCarry=Math.max(priorNg>0?1:0,badDomain==='layer'?badSeverity:0);
+    const camCarry=Math.max(
+      badDomain==='camera'?badSeverity:0,
+      priorCamRep<=-5&&priorCamHostile?2:(priorCamRep<=-3?1:0)
+    );
+
+    const result=_startSecondLoop_v637.apply(this,arguments);
+
+    S.priorLayerRumorLevel=layerCarry;
+    S.priorCamRumorLevel=camCarry;
+    S.priorRumorLevel=layerCarry; // 旧処理にはレイヤー側の噂だけを渡す
+    S.priorPhotoScores=priorScores;
+
+    /* 旧版がカメコBADをレイヤー悪評として反映した分を戻し、
+       レイヤー側の出来事だけで初期評判を決め直す。 */
+    S.rep=Math.max(-2,Math.round(priorRep*.6));
+    S.trust=Math.max(0,Math.round(priorTrust*.5));
+    S.unease=Math.max(0,Math.round(priorUnease*.25));
+    if(layerCarry>=2){
+      S.rep=Math.min(S.rep,-5);
+      S.trust=Math.min(S.trust,0);
+      S.unease=Math.max(S.unease,5);
+    }else if(layerCarry===1){
+      S.rep=Math.min(S.rep,-2);
+      S.unease=Math.max(S.unease,3);
+    }
+    try{v2Status()}catch(e){}
+    return result;
+  };
+
+  /* カメコ界隈の悪評だけなら、レイヤー側は噂を聞いて警戒する段階まで。
+     ブラックリスト級はレイヤー本人への重い問題行動がある時だけ。 */
+  const _layerRepName_v637=layerRepName;
+  layerRepName=function(){
+    const rank=_layerRepName_v637.apply(this,arguments);
+    if(rank==='ブラックリスト級カメコ') return rank;
+    if(cameraRumorLevelV637()>0 && layerRumorLevelV637()===0) return '要警戒カメコ';
+    return rank;
+  };
+
+  const CAMERA_RUMOR_LINES_V637={
+    outdoor:'「マボさんですよね……？ ほかのカメラマンさんから少し聞いてます」<br>雪奈は丁寧に話しながらも、カメラバッグへ一度視線を落とした。',
+    indoor:'「名前は聞いてます。カメラマン同士で少し揉めたそうですね」<br>りおは決めつけず、返事を待っている。',
+    rest:'「あの……カメラマンさんたちから、ちょっと話を聞いてて」<br>みくは申し訳なさそうにしながら、少し距離を取った。',
+    east:'「カメラマン界隈での話が少し耳に入っています」<br>カレンは写真の評価と噂を分けるように、静かにこちらを見る。',
+    entrance:'「マボさんですよね？ 友達のカメラマンから少し聞いてます」<br>あやは友人のそばで、慎重に返事を待った。'
+  };
+
+  function cameraRumorRecoveryV637(p,mode){
+    const P=people[p];
+    if(mode==='apology'){
+      S.priorCamRumorLevel=Math.max(0,cameraRumorLevelV637()-1);
+      S.rep++;S.trust++;S.backedOff++;
+      try{v2Status()}catch(e){}
+      story(p,P.name,'「そうだったんですね。言い方が悪かったって分かっているなら……写真とは分けて考えます」<br><span class="thought">（噂を消せはしない。でも、ここで他人のせいにしなかったことは伝わった。）</span>',[
+        ['今日の撮影について丁寧に確認する',()=>loop2ShootOffer(p)],
+        ['今日は挨拶だけにして離れる',()=>show('map')]
+      ]);return;
+    }
+    if(mode==='blame'){
+      S.unease+=2;S.rep--;
+      story(p,P.name,'「……そういう言い方をするなら、今日は撮影はやめておきます」<br><span class="thought">（噂を否定するつもりが、自分で補強した。）</span>',[
+        ['言い返さず離れる',()=>{S.backedOff++;refuse(p);show('map')}]
+      ]);return;
+    }
+    if(mode==='photo'){
+      const score=Number(S.priorPhotoScores?.[p]||0);
+      if(score>=80){
+        S.priorCamRumorLevel=Math.max(0,cameraRumorLevelV637()-1);
+        S.rep++;S.trust++;
+        try{v2Status()}catch(e){}
+        story(p,P.name,'「前回の写真、ちゃんと良かったです。私は写真と今日の対応を見て判断します」<br><span class="thought">（'+score+'点の一枚が、噂だけで決めつけられる流れを少し止めてくれた。）</span>',[
+          ['今日の希望を聞く',()=>loop2ShootOffer(p)],
+          ['礼を言って離れる',()=>show('map')]
+        ]);return;
+      }
+      S.unease++;
+      story(p,P.name,'「写真は確認しました。でも、それとカメラマン同士の話は別だと思います」<br><span class="thought">（写真だけで全部ひっくり返せるほど、強い一枚ではなかった。）</span>',[
+        ['無理に頼まず離れる',()=>{S.backedOff++;show('map')}],
+        ['それでも撮影をお願いする',()=>{refuse(p);S.unease++;show('map')}]
+      ]);return;
+    }
+    S.rude++;S.unease+=2;
+    story(p,P.name,'「誰が言ったかは答えません。そうやって相手を探されるのも困ります」<br><span class="thought">（確認のつもりでも、相手には詰め寄りに見えた。）</span>',[
+      ['謝って離れる',()=>{S.backedOff++;refuse(p);show('map')}]
+    ]);
+  }
+
+  /* カメコ悪評だけが伝わっている場合の専用会話。
+     返答次第で挽回でき、噂だけではブラックリスト級にならない。 */
+  const _loop2NormalChoices_v637=loop2NormalChoices;
+  loop2NormalChoices=function(p){
+    if(cameraRumorLevelV637()>0 && layerRumorLevelV637()===0){
+      const P=people[p];
+      const line=CAMERA_RUMOR_LINES_V637[p]||CAMERA_RUMOR_LINES_V637.outdoor;
+      story(p,P.name,line+'<br><span class="thought">（カメコ評判：悪評。その噂がレイヤーにも届いている。ただし、まだ本人への行動で判断してもらえる余地はある。）</span>',[
+        ['「自分の言い方が悪かったです」と認める',()=>cameraRumorRecoveryV637(p,'apology')],
+        ['「あいつらが勝手に言ってるだけです」と返す',()=>cameraRumorRecoveryV637(p,'blame')],
+        ['「撮った写真を見て判断してください」と伝える',()=>cameraRumorRecoveryV637(p,'photo')],
+        ['「誰から聞いたんですか？」と問い詰める',()=>cameraRumorRecoveryV637(p,'source')]
+      ]);return;
+    }
+    return _loop2NormalChoices_v637.apply(this,arguments);
+  };
+
+  const versionEl=document.querySelector('.titleVersion');
+  if(versionEl) versionEl.textContent='Ver. 6.37';
+  try{v2Status()}catch(e){}
+})();
+</script>
+
 </body></html>
